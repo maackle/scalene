@@ -1,0 +1,35 @@
+
+EVENTS
+
+States (transitions)
+
+GFX
+	2D
+		Text
+		Sprite / Spritesheet
+		Animation
+		Layers
+
+Scenegraph
+
+Physics
+Hit Test
+Collision
+
+(Groups)
+
+View
+
+Particles
+Object pools
+
+Scheduling
+	Time lines
+	Scripts
+
+
+-- wishlist
+
+networking
+scripting
+hot reloading

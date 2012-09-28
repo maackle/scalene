@@ -1,0 +1,8 @@
+gen-idea
+run
+gen-idea
+exit
+test
+exit
+test
+exit
