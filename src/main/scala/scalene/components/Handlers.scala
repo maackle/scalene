@@ -27,25 +27,22 @@ case class KeyUpEvent(code:Int) extends KeyEvent
 
 trait EventSource extends Thing with Update with Logging { self =>
   protected def raise(ev:Event) {
-    info("raised: %s" format ev)
+    debug("raised: %s" format ev)
     eventQueue += ev
   }
-  protected def eventDomain:Set[Event.Id] // so we only check events we need to
-  protected val eventQueue = mutable.ListBuffer[Event]()
 
-  def setDomain(evs:Seq[Event.Id]) { ??? }
+  protected val eventQueue = mutable.ListBuffer[Event]()
 
   def presentTo(sink:EventSink) {
     for {
       ev <- eventQueue
-      op <- sink.handler.consume(ev)
+      op <- sink.events.consume(ev)
     } {
-      info("event consumed! %s %s" format (ev, op) )
+      debug("event consumed: %s %s" format (ev, op) )
     }
   }
 
   def ++ (other:EventSource) = new EventSource {
-    val eventDomain = self.eventDomain ++ other.eventDomain
     def update() {
       self.update()
       other.update()
@@ -58,25 +55,27 @@ trait EventSource extends Thing with Update with Logging { self =>
  * and when it changes, go through and check isDefinedAt for each value
  * */
 class KeyEventSource extends EventSource {
-  protected val eventDomain = Set(LWJGLKeyboard.keyRange:_*)
   private val keyState = collection.mutable.Map[Event.Id, MemBoolean]()
-
-  private def updateKey(code:Event.Id) = {
-    val s = keyState.getOrElseUpdate(code, MemBoolean(16))
-    s << Kbd.isKeyDown(code)
-    s
-  }
+  private val downKeys = collection.mutable.Set[Event.Id]()
 
   def update() {
+
     eventQueue.clear()
-    for {
-      code <- eventDomain
-      down = updateKey(code)
-    } {
-      if(down.now) raise( KeyHoldEvent(code) )
-      if(down.xOn) raise( KeyDownEvent(code) )
-      else if(down.xOff) raise( KeyUpEvent(code) )
+
+    while(Kbd.next) {
+      val code = Kbd.getEventKey
+      val down = Kbd.getEventKeyState
+      if(down) {
+        raise( KeyDownEvent(code) )
+        downKeys += code
+      }
+      else {
+        raise( KeyUpEvent(code) )
+        downKeys -= code
+      }
     }
+
+    for(code <- downKeys) raise( KeyHoldEvent(code) )
   }
 }
 
@@ -92,8 +91,8 @@ trait EventHandler {
   private var _fn:HandlerFn = EventHandler.empty
   def consume(ev:Event) = {
     _fn.lift(ev) map { op =>
-      Logger("handler").info("consumed %s and got: %s" format(ev, op))
-
+      Logger("EventHandler").debug("consumed %s and got: %s" format(ev, op))
+      op()
     }
   }
   def += (f:PartialFunction[Event, Op]) {
@@ -103,10 +102,28 @@ trait EventHandler {
 }
 
 trait EventSink extends Thing {
-  val handler = new EventHandler {}
+  val events = new EventHandler {}
 //  def consume(source:EventSource)
 }
 
-trait KeyEventSink extends EventSink {
+trait KeyEventSink extends EventSink with LWJGLKeyboard {
 //  def consume(source:EventSource) = source.presentTo(this)
+}
+
+/* TODO:
+Message-style event triggering, instead of global events that all can hear
+ !() adds events to a particular object's event queue.
+!!() specifies an event that should be passed on to contained Things (probably trait of EventHandlerContainer)
+
+Try to get event bubbling to work.
+*/
+
+trait TargetedEventHandler extends Update {
+  type HandlerFn = PartialFunction[Event, Op]
+
+  def handler:HandlerFn
+
+  def !(ev:Event) { queue += ev }
+
+  private val queue = mutable.Queue[Event]()
 }

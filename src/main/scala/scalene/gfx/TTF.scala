@@ -10,9 +10,10 @@ import org.lwjgl.opengl.GL11._
 
 import scalene.vector.{vec, vec2}
 import scalene.core.Resource
+import grizzled.slf4j.Logging
 
 
-case class TTF(font:Resource[Font], size:Int, style:TTF.FontStyle.Plain.type) {
+case class TTF(font:Resource[_,Font], size:Int, style:TTF.FontStyle.Plain.type) {
 
   var anchor = vec2.zero
 
@@ -36,7 +37,6 @@ case class TTF(font:Resource[Font], size:Int, style:TTF.FontStyle.Plain.type) {
       (anchor.x/2 + .5f) * -w,
       (anchor.y/2 + .5f) * h
     )
-//    glEnable(GL_TEXTURE_2D)
     gl.matrix {
       gl.translate(pos)
       gl.scale(scale, scale)
@@ -44,22 +44,24 @@ case class TTF(font:Resource[Font], size:Int, style:TTF.FontStyle.Plain.type) {
       gl.scale(1,-1)
       uni.drawString(0, 0, what, color.toSlick )
     }
-//    glDisable(GL_TEXTURE_2D)
   }
 
 }
 
-object TTF {
+object TTF extends Logging {
+  def load(path:String, size:Int) = {
+    val font =
+      try {
+        Font.createFont(Font.TRUETYPE_FONT, getStream(path) )
+      }
+      catch {
+        case e:java.lang.RuntimeException => new Font(path, Font.PLAIN, size)
+      }
+    info("loaded font: " + font)
+    font
+  }
   def apply(path:String, size:Int, style:FontStyle.Plain.type=FontStyle.Plain):TTF = {
-    var font:Resource[Font] = null
-    try {
-      font = Resource(path) ( path => Font.createFont(Font.TRUETYPE_FONT, getStream(path) ) )
-    }
-    catch {
-      case e:java.lang.RuntimeException =>
-        font = Resource(path)( new Font(_, Font.PLAIN, size) )
-
-    }
+    val font = Resource(path) ( load(_,size) )
     new TTF(font, size, style)
   }
 

@@ -18,7 +18,7 @@ object BlobDomain extends Domain2D(Run) { domain =>
 
   class Blob(val position:vec2) extends Thing with Position2D with Update with Render with InternalTransform {
 
-    val __transform = Transform.dynamic(position, vec2.one, 0)
+    val __transform = Transform.dynamic(()=>position, null, null)
     val color = Color.magenta * maackle.util.Random.uniform(0.5,1).toFloat
 
     def update() {
@@ -27,7 +27,7 @@ object BlobDomain extends Domain2D(Run) { domain =>
 
     def render() {
       color.bind()
-//      draw.circle(1.0)
+      draw.circle(1.0)
     }
 
   }
@@ -44,7 +44,7 @@ object BlobDomain extends Domain2D(Run) { domain =>
 
     this ++= blobs
 
-    val views = new ViewSingle2D {
+    val view = new ViewSingle2D {
 
       val view = new View2D {
         zoom = 2

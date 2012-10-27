@@ -9,15 +9,18 @@ import traits._
 import grizzled.slf4j.Logging
 import vector._
 import run.Run
+import org.newdawn.slick.opengl.TextureImpl
 
 class Snail extends Sprite("img/snail.png") with KeyEventSink {
 
 }
 
-object TestDomain extends Domain2D(Run) with Logging { domain =>
+object SnailDomain extends Domain2D(Run) with Logging { domain =>
 
   var zoom = 1.0
   val snail = new Snail
+  val box = new Sprite("img/packtest/2.png")
+  val boxes = (0 to 100) map (_ => box) toList
   val font = TTF("font/redhead.ttf", 100)
   val drawText = DrawOp {
     font.drawString("HELLO", vec(100,100), Color.red)
@@ -26,30 +29,34 @@ object TestDomain extends Domain2D(Run) with Logging { domain =>
   val bg = new SolidBackground(Color(0.5f, 0.5f, 0.5f))
 
   val thangs = (
-    drawText ::
-    snail :: Nil
+//    drawText ::
+//    snail ::
+//    box ::
+    boxes :::
+    Nil
   )
 
   this += bg
   this ++= thangs
   this += new KeyEventSink {
-    handler += {
+    events += {
       case KeyDownEvent(code) => { Op.NOOP }
     }
   }
 
   //TODO: make it easy to copy() a state and change a few things
-  object AState extends State(domain) {
-    val views = {
-      new ViewSingle2D {
-        val view = new View2D {
-          val layers = Vector(
-            new Layer2D(0)(bg :: Nil),
-            new Layer2D(1)(thangs)
-          )
-        }
-      }
-    }
+  object SnailState extends State(domain) {
+
+//    override def render() {
+//      bg.render()
+//      snail.render()
+////      boxes foreach { b =>
+////        b.render()
+////        font.drawString("HELLO", vec(100,100), Color.red)
+////      }
+//    }
+
+    val view = ViewScheme.simple(bg.color, thangs)
 
     val eventSource = new KeyEventSource
 

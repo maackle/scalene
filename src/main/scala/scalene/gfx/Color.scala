@@ -24,7 +24,14 @@ object Color {
   }
 
   def apply(h: Int) = {
-    new Color(((h & 0xff0000) >> 16) / 255f, ((h & 0xff00) >> 8) / 255f, ((h & 0xff)) / 255f, 1.0f)
+    new Color(((h & 0xff0000) >> 16) / 255f, ((h & 0xff00) >> 8) / 255f, ((h & 0xff)) / 255f, 1f)
+  }
+  def apply(h: Int, a:Float) = {
+    new Color(((h & 0xff0000) >> 16) / 255f, ((h & 0xff00) >> 8) / 255f, ((h & 0xff)) / 255f, a)
+  }
+
+  def hsv(h:Float, s:Float, v:Float, a:Float=1.0f) = {
+    Color( java.awt.Color.HSBtoRGB(h,s,v), a )
   }
 
   def lerp(c1: Color, c2: Color, amt: Float): Color = {

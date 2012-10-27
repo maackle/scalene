@@ -7,6 +7,7 @@ import org.lwjgl.input.{Keyboard}
 object LWJGLKeyboard extends LWJGLKeyboard
 
 trait LWJGLKeyboard {
+
   type KeyEventId = Int
   lazy val MOUSE_LEFT_BUTTON   = 0
   lazy val MOUSE_RIGHT_BUTTON  = 1

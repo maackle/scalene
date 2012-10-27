@@ -3,28 +3,29 @@ package scalene.traits
 import scalene.components.{EventSource, EventSink}
 import scalene.core.ScaleneApp
 
-trait ThingStore {
+trait ThingStore extends Thing {
 
   def app:ScaleneApp
 
   def update() {
-    updateables foreach {
+    val us = updateables
+    us foreach {
       case t : Update => t.update()
       case _ =>
     }
-    updateables.view.map {
+    (us + this) foreach {
       case s : EventSink => app.eventSources.foreach(_.presentTo(s))
       case _ =>
     }
   }
 
-  protected def += (t:Thing) { __things += t }
-  protected def -= (t:Thing) { __things -= t }
-  protected def ++= (t:Seq[Thing]) { __things ++= t }
-  protected def --= (t:Seq[Thing]) { __things --= t }
+  protected def += (t:Thing) { assert(t!=this); __things += t }
+  protected def -= (t:Thing) { assert(t!=this); __things -= t }
+  protected def ++= (t:Seq[Thing]) { assert(t!=this); __things ++= t }
+  protected def --= (t:Seq[Thing]) { assert(t!=this); __things --= t }
 
   private var __things = collection.mutable.Set[Thing]()
-  def updateables:Seq[Thing] = __things.toSeq
+  def updateables:Set[Thing] = __things.toSet
 }
 
 abstract class Domain(val app:ScaleneApp) extends ThingStore with Update {

@@ -6,10 +6,22 @@ import scalene.common._
 import scalene.vector._
 import org.lwjgl.util.glu.GLU
 import scalene.gfx
-import scalene.gfx.{Transform2D, Transformer2D, Transform, gl}
+import scalene.gfx._
 import org.lwjgl.opengl.GL11
+import scalene.misc.SolidBackground
 
 trait ViewScheme extends Render
+
+object ViewScheme {
+  def simple(bg:Color, things:Seq[Thing with Render]) = new ViewSingle2D {
+    val view = new View2D {
+      val layers = Vector(
+        new Layer2D(0)(new SolidBackground(bg) :: Nil),
+        new Layer2D(1)(things)
+      )
+    }
+  }
+}
 
 object NoViewScheme extends ViewScheme {
   val transform = Transform.static()
@@ -72,8 +84,13 @@ trait View2D extends View { view =>
 //  protected var scale:vec2 = vec2.one
   protected var rotation:Radian = 0.0f
   protected var scroll:vec2 = vec2.zero
-
-  val __transform = Transform.dynamic(scroll, vec(zoom, zoom), rotation)
+  private var _scale = vec2.one
+  def scale = {
+    _scale.x = zoom
+    _scale.y = zoom
+    _scale
+  }
+  val __transform = Transform.dynamic(()=>scroll, scale _, ()=>rotation)
 
   class Layer2D(val parallax:R = 1)(protected val things:Seq[Member]) extends Layer {
     import implicits._

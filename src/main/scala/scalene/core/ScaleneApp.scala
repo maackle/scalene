@@ -9,21 +9,25 @@ import scalene.traits._
 import maackle.util.getStream
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.util.glu.GLU
-import org.lwjgl.opengl.{GL11, PixelFormat, DisplayMode, Display}
-import org.newdawn.slick.opengl.{TextureLoader, Texture}
+import org.lwjgl.opengl._
+import org.newdawn.slick.opengl.{TextureImpl, TextureLoader, Texture}
 import grizzled.slf4j.Logging
 import scalene.gfx.GLSettings
 import scalene.input.LWJGLKeyboard
-import scalene.components.EventSource
+import scalene.components.{KeyEventSource, EventSource}
 import scalene.helpers.{MemDouble, MemInt}
+import scalene.traits.State.StateMachine
+import scalene.helpers.MemDouble
 
-abstract class ScaleneApp extends App with Initialize with Logging {
+trait ScaleneInnerClasses { app:ScaleneApp => }
+
+abstract class ScaleneApp extends App with ScaleneInnerClasses with Initialize with Logging {
 
   val windowSize:Option[(Int,Int)]
   val windowTitle:String
   val startState:State
   def currentState:State = stateMachine.current
-  val fps = 60
+  val fps = 30
   val vsync = true
   lazy val msecsStartup = milliseconds
   def fullscreen = windowSize.isEmpty
@@ -34,11 +38,16 @@ abstract class ScaleneApp extends App with Initialize with Logging {
 
   private def _winsize = windowSize.get
 
-  private val _eventSources = collection.mutable.Set[EventSource]()
+  private val _eventSources = collection.mutable.Set[EventSource](
+    new KeyEventSource
+  //TODO: add mouse source, controllers, etc.
+  )
   def eventSources = _eventSources.toSeq
-  def registerEventSource(es:EventSource) {
-    _eventSources += es
-  }
+
+  //TODO: let's not use this for the basics.  only for user-created Sources (none exist yet (10-8))
+//  private def registerEventSource(es:EventSource) {
+//    _eventSources += es
+//  }
 
   def avgFPS = {
     1000 / _loopTime.avg
@@ -46,8 +55,10 @@ abstract class ScaleneApp extends App with Initialize with Logging {
   def lastFPS = {
     1000 / _loopTime.now
   }
+  def ticks = _tick
 
   delayedInit {
+
     info("starting up at %s" format msecsStartup)
     doInitialize()
     var _ms = milliseconds
@@ -57,7 +68,9 @@ abstract class ScaleneApp extends App with Initialize with Logging {
       val newms = milliseconds
       _loopTime << (milliseconds - _ms)
       _ms = newms
+//      TextureImpl.bindNone() // TODO: find a way to remove this!
       if(_tick % 100 == 0) println("FPS: %s %s" format (avgFPS, lastFPS))
+      Display.sync(fps)
     }
     doCleanup()
   }
@@ -67,14 +80,17 @@ abstract class ScaleneApp extends App with Initialize with Logging {
     Display.setVSyncEnabled(vsync)
     if(fullscreen) Display.setFullscreen(true)
     else Display.setDisplayMode(new DisplayMode(_winsize._1, _winsize._2))
-    Display.create(new PixelFormat(8, 16, 4))
-    Display.sync(fps)
+    val pxfmt = new PixelFormat()
+    val ctxAttr = new ContextAttribs(3, 2)
+    ctxAttr.withForwardCompatible(true);
+//    contextAtrributes.withProfileCore(true);
+    Display.create(pxfmt, ctxAttr)
     info("Display created")
+    info("bpp: " + Display.getDisplayMode.getBitsPerPixel)
 
-    Resource.loadAll()
+    Resource.startAutoload(true) // as soon as the display is initialized we can load resources
 
     GLSettings.defaults()
-
     GLSettings.orthographic()
 
   }
@@ -85,6 +101,7 @@ abstract class ScaleneApp extends App with Initialize with Logging {
 
   def loopBody() {
     currentState.update()
+    _eventSources.foreach(_.update())
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()

@@ -11,5 +11,5 @@ object Run extends {
 
 } with ScaleneApp {
 
-  lazy val startState = new VBODomain.VBOTestState
+  lazy val startState = SnailDomain.SnailState
 }

@@ -92,5 +92,7 @@ abstract class vec2base extends vector {
   def >(v:vec2) = x > v.x && y > v.y
   def >=(v:vec2) = x >= v.x && y >= v.y
 
+  override def toString = "vec2( %s, %s )".format(x,y)
+
 }
 

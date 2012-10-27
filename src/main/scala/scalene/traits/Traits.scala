@@ -25,25 +25,35 @@ trait Initialize {
   }
 }
 
+//
+//trait EnterExit {
+//
+//  private var enterOps = ListSet[Op]()
+//  private var exitOps = ListSet[Op]()
+//  protected def doEnter() {
+//    enterOps foreach { op => op() }
+//  }
+//  protected def doExit() {
+//    exitOps foreach { op => op() }
+//  }
+//
+//  protected def onEnter(bloc: =>Unit) {
+//    enterOps += Op( bloc )
+//  }
+//  protected def onExit(bloc: =>Unit) {
+//    exitOps += Op( bloc )
+//  }
+//}
+//
+
+
 
 trait EnterExit {
-
-  private var enterOps = ListSet[Op]()
-  private var exitOps = ListSet[Op]()
-  protected def doEnter() {
-    enterOps foreach { op => op() }
-  }
-  protected def doExit() {
-    exitOps foreach { op => op() }
-  }
-
-  protected def onEnter(bloc: =>Unit) {
-    enterOps += Op( bloc )
-  }
-  protected def onExit(bloc: =>Unit) {
-    exitOps += Op( bloc )
-  }
+  def onEnter(bloc: =>Unit)
+  def onExit(bloc: =>Unit)
 }
+
+
 
 trait Simulate {
   def simulate(dt:R)

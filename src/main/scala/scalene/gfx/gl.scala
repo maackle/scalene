@@ -35,7 +35,7 @@ trait gl {
     glDisable(what)
   }
 
-  def texture2 = enable(GL_TEXTURE_2D) _
+  def texture2d = enable(GL_TEXTURE_2D) _
 
   @inline
   def fill(yes: Boolean) {
