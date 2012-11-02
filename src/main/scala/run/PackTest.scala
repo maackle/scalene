@@ -6,6 +6,7 @@ import scalene.core.ScaleneApp
 import scalene.traits.State
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
+import org.lwjgl.opengl.GL11
 
 object Packer {
 
@@ -53,6 +54,9 @@ object Packer {
 }
 
 object PackTest extends App {
+
+
+
   val ts = Packer {
     "src/main/resources/img/packtest"
   }
@@ -66,3 +70,30 @@ object PackTest extends App {
 //  lazy val startState = new PackTestDomain.Do
 //
 //}
+
+
+
+
+
+
+
+
+
+
+
+
+object Sugar {
+
+
+  val list = List(1,2,3,4,5)
+
+  for (i <- list) yield { i.toFloat }
+  (4 -> 5)
+  (4,5)
+  Map[Int,String] (
+    (4 -> "four"),
+    (5, "five")
+  )
+  list map (x => x.toFloat)
+  list foreach (println(_))
+}
