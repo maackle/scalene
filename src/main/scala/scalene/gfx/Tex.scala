@@ -3,20 +3,7 @@ package scalene.gfx
 import org.newdawn.slick.opengl.{TextureImpl, Texture, TextureLoader}
 import maackle.util._
 import org.lwjgl.opengl.GL11._
-import org.lwjgl.opengl.GL12._
-import scalene._
-import core.{ScaleneInnerClasses, ScaleneApp}
-import vector._
-import grizzled.slf4j.Logging
-import org.lwjgl.opengl.GL11
-import java.io.{FileInputStream, File, InputStream}
-import org.newdawn.slick.PackedSpriteSheet
-import javax.imageio.ImageIO
-import java.nio.{IntBuffer, ByteOrder, Buffer, ByteBuffer}
-import java.awt.image.{BufferedImage, DataBufferByte}
-import java.awt.Image
-import org.lwjgl.BufferUtils
-import java.awt.color.ColorSpace
+import org.lwjgl.opengl.{GL13, GL15}
 
 //class Tex(val id:Int, image:BufferedImage) {
 //  val (getImageWidth, getImageHeight) = (image.getWidth, image.getHeight)
@@ -27,53 +14,27 @@ import java.awt.color.ColorSpace
 //  }
 //}
 
+/**
+ * Just a simple wrapper for Slick Texture
+ *
+ * @param t
+ */
 class Tex(t:Texture) {
   val (getImageWidth, getImageHeight) = (t.getImageWidth, t.getImageHeight)
   val (getTextureWidth, getTextureHeight) = (t.getTextureWidth, t.getTextureHeight)
   val id = t.getTextureID
   def bind() {
-    glEnable(GL_TEXTURE_2D)
     if(Tex.lastBoundId != id) {
       glBindTexture(GL_TEXTURE_2D, t.getTextureID)
       Tex.lastBoundId = id
     }
   }
 }
+
 //TODO: don't rely on singleton!
 object Tex {
   private var lastBoundId = -1
 }
-
-
-object Bitmap {
-
-  def load(path:String) = new Tex(loadTexture(path))
-  def load(file:File) = new Tex(loadTexture(file))
-
-  def loadTexture(path:String) = {
-    val reg = """.*\.(.+?)$""".r
-    val reg(ext) = path
-    val tex = ext match {
-      case "png" | "gif" | "jpg" | "jpeg" => { TextureLoader.getTexture(ext, getStream(path)) }
-      case _ => throw new Exception("image format '%s' is not recognized".format(ext))
-    }
-    tex
-  }
-
-  //TODO: test!
-  def loadTexture(file:File) = {
-    assert(file.isFile)
-    val reg = """.*\.(.+?)$""".r
-    val path = file.getPath
-    val reg(ext) = path
-    val tex = ext match {
-      case "png" | "gif" | "jpg" | "jpeg" => { TextureLoader.getTexture(ext, new FileInputStream(file)) }
-      case _ => throw new Exception("image format '%s' is not recognized".format(ext))
-    }
-    tex
-  }
-}
-
 
 
 trait Textured {
@@ -81,6 +42,7 @@ trait Textured {
 
   def bindAnd(andThenDo: =>Unit) {
 //    glEnable(GL_TEXTURE_2D)
+    GL13.glActiveTexture(GL13.GL_TEXTURE0)
     gl.texture2d {
       tex.bind()
       andThenDo
@@ -95,6 +57,17 @@ trait Textured {
   FAILURES:
 
 
+import org.lwjgl.opengl.GL12._
+import scalene._
+import core.{ScaleneInnerClasses, ScaleneApp}
+import vector._
+import grizzled.slf4j.Logging
+import org.lwjgl.opengl.GL11
+import java.io.{FileInputStream, File, InputStream}
+import java.nio.{IntBuffer, ByteOrder, Buffer, ByteBuffer}
+import java.awt.image.{BufferedImage, DataBufferByte}
+import org.lwjgl.BufferUtils
+import java.awt.color.ColorSpace
 
 
   def load(file:File):Tex = load(ImageIO.read(file))

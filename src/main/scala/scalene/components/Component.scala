@@ -7,9 +7,11 @@ import scalene.gfx.Transform
 
 trait Component
 
-trait Position extends Component { def position: vector }
+trait Position extends Component { def position: vec }
 trait Position2D extends Component {
   def position: vec2
+}
+trait PositionXY extends Position2D {
   def x = position.x
   def y = position.y
   def x_=(v:common.R) { position.x = v}
@@ -31,7 +33,7 @@ trait Affine2D extends InternalTransform with Position2D with Rotation with Scal
   val __transform = Transform.dynamic(()=>position, ()=>scale, ()=>rotation)
 }
 
-trait Velocity extends Component { def velocity: vector }
+trait Velocity extends Component { def velocity: vec }
 trait Velocity2D extends Component { def velocity: vec2 }
 
 trait Collider extends Position2D

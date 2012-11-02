@@ -1,7 +1,7 @@
 package scalene.core
 
 import scalene.common._
-import scalene.gfx.{GLSettings, Bitmap, gl, Color}
+import scalene.gfx.{GLSettings, Image, gl, Color}
 import org.lwjgl.BufferUtils
 import java.nio.{IntBuffer, FloatBuffer}
 import scalene.vector._
@@ -14,20 +14,23 @@ import org.newdawn.slick.opengl.{TextureImpl, TextureLoader, Texture}
 import grizzled.slf4j.Logging
 import scalene.gfx.GLSettings
 import scalene.input.LWJGLKeyboard
-import scalene.components.{KeyEventSource, EventSource}
+import scalene.event.{Event, KeyEventSource, EventSource}
 import scalene.helpers.{MemDouble, MemInt}
 import scalene.traits.State.StateMachine
 import scalene.helpers.MemDouble
 
-trait ScaleneInnerClasses { app:ScaleneApp => }
+//trait ScaleneInnerClasses { app:ScaleneApp => }
 
-abstract class ScaleneApp extends App with ScaleneInnerClasses with Initialize with Logging {
+abstract class ScaleneApp
+extends App /*with ScaleneInnerClasses*/
+with Initialize
+with Logging {
 
   val windowSize:Option[(Int,Int)]
   val windowTitle:String
   val startState:State
   def currentState:State = stateMachine.current
-  val fps = 30
+  val fps = 60
   val vsync = true
   lazy val msecsStartup = milliseconds
   def fullscreen = windowSize.isEmpty
@@ -38,7 +41,7 @@ abstract class ScaleneApp extends App with ScaleneInnerClasses with Initialize w
 
   private def _winsize = windowSize.get
 
-  private val _eventSources = collection.mutable.Set[EventSource](
+  private val _eventSources = collection.mutable.Set[EventSource[Event]](
     new KeyEventSource
   //TODO: add mouse source, controllers, etc.
   )

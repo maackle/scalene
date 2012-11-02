@@ -1,21 +1,35 @@
 package scalene.traits
 
-import scalene.components.{EventSource, EventSink}
 import scalene.core.ScaleneApp
+import scalene.event.{EventSink, Event, EventSource, EventSinkSpecific}
 
 trait ThingStore extends Thing {
 
   def app:ScaleneApp
 
+//  def drain[A <: Event, B >: A <: Event](source:EventSource[A])(sinks:Iterable[EventSinkSpecific[B]]) {
+//    for(sink <- sinks if sink.isInstanceOf[EventSinkSpecific[B]]) {
+//      source.presentTo(sink)
+//    }
+//  }
+
   def update() {
     val us = updateables
+    val sinks:Set[EventSink] = (updateables+this) flatMap {
+      case s:EventSink => Some(s)
+      case _ => None
+    }
     us foreach {
-      case t : Update => t.update()
+      case t : Update =>
+        t.update()
       case _ =>
     }
-    (us + this) foreach {
-      case s : EventSink => app.eventSources.foreach(_.presentTo(s))
-      case _ =>
+
+    for {
+      source <- app.eventSources
+      sink <- sinks
+    } {
+      source.presentTo(sink)
     }
   }
 

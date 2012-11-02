@@ -13,6 +13,7 @@ trait Resource[I,O] {
   def load()
 }
 
+//TODO: cache file names
 object Resource extends Logging {
   private val all = collection.mutable.Set[Resource[_,_]]()
 

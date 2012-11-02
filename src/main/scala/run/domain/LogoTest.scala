@@ -3,9 +3,8 @@ package run.domain
 import run.Run
 import scalene.traits.{ViewScheme, Update, Thing, State}
 import scalene.components._
-import scalene.vector.mutable.vec2
 import scalene.core.{Op, VBO}
-import scalene.vector.vec
+import scalene.vector.{vec2, vec}
 import org.lwjgl.opengl.GL11
 import scalene.gfx.{gl, Color}
 import scalene.components.KeyHoldEvent
@@ -22,7 +21,6 @@ class LogoTest extends State(Run) with KeyEventSink {
     case KeyHoldEvent(KEY_MINUS) => Op { view.view.zoom *= 0.99 }
     case KeyHoldEvent(KEY_EQUALS) => Op { view.view.zoom *= 1.01 }
   }
-
 
   object Logo {
     import math._
@@ -52,7 +50,7 @@ class LogoTest extends State(Run) with KeyEventSink {
       verts foreach( println(_) )
       (verts, indices)
     }
-    val vbo = VBO.create(verts, indices)
+    val vbo = VBO.create(verts, indices=indices)
   }
   class Logo(var position:vec2) extends Thing with Update with Affine2D {
     var rotation = 0.0

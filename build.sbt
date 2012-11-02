@@ -18,9 +18,9 @@ libraryDependencies ++= Seq(
   "org.lwjgl.lwjgl" % "lwjgl_util" % "2.8.4",
   "org.lwjgl.lwjgl" % "lwjgl-platform" % "2.8.4", // classifier "natives-osx" classifier "natives-windows" classifier "natives-linux",
   "net.java.jinput" % "jinput" % "2.0.5",
-  "net.java.jinput" % "jinput-platform" % "2.0.5" classifier "natives-osx" classifier "natives-windows" classifier "natives-linux",
-//  "com.googlecode.soundlibs" % "jorbis" % "0.0.17-1",
-  "slick" % "slick" % "248"
+  "net.java.jinput" % "jinput-platform" % "2.0.5" classifier "natives-osx" classifier "natives-windows" classifier "natives-linux"
+//  "com.googlecode.soundlibs" % "jorbis" % "0.0.17-1"
+//  "slick" % "slick" % "248"
 )
 
 

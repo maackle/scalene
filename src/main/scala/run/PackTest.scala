@@ -1,7 +1,6 @@
 package run
 
 import java.io.File
-import scalene.gfx.Bitmap
 import maackle.util._
 import scalene.core.ScaleneApp
 import scalene.traits.State
@@ -34,10 +33,17 @@ object Packer {
     val maxh = (0 /: images)(_ + _.getHeight)
     val buf = new BufferedImage(maxw,maxh,BufferedImage.TYPE_INT_ARGB)
     var x = 0
+    case class Space(x:Int, y:Int, w:Int, h:Int)
+    var spaces = List[Space]()
     val g = buf.getGraphics
-    for {
-      im <- images
-    } {
+    def fits(im:BufferedImage, space:Space) = {
+      im.getWidth <= space.w && im.getHeight <= space.h
+    }
+    for (im <- images) {
+      for(space <- spaces) {
+
+      }
+
       g.drawImage(im, x, 0, null)
       x += im.getWidth
     }

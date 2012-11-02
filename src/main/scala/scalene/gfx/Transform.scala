@@ -52,22 +52,22 @@ trait Transform { self =>
 }
 
 trait TransformRigid extends Transform {
-  def translate: vector
+  def translate: vec
   def rotate: Radian
 }
 
 trait TransformAffine extends TransformRigid {
-  def scale: vector
-  def shear:vector = ???
+  def scale: vec
+  def shear:vec = ???
 }
 
 trait TransformerRigid extends Transform {
-  def translate: ()=>vector
+  def translate: ()=>vec
   def rotate: ()=>Radian
 }
 trait TransformerAffine extends TransformerRigid {
-  def scale: ()=>vector
-  def shear: ()=>vector = ???
+  def scale: ()=>vec
+  def shear: ()=>vec = ???
 }
 
 object Transform2D {

@@ -4,13 +4,12 @@ import scalene.traits._
 import run.Run
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl._
-import scalene.vector.vec
+import scalene.vector.{vec2, vec}
 import java.nio.DoubleBuffer
 import scalene.core.{Op, VBO, DrawOp}
 import scalene.gfx.{Color, gl}
 import grizzled.slf4j.Logging
 import scalene.components._
-import scalene.vector.mutable.vec2
 import maackle.util.Random
 import scalene.components.KeyHoldEvent
 

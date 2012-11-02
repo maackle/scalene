@@ -3,9 +3,11 @@ package scalene.vector
 import scala.math._
 import grizzled.slf4j.Logging
 
+trait vec
+
 object vec extends Logging { self =>
 
-  object Random {
+  private object Random {
     val rand = new scala.util.Random()
     def uniform(lo: Double = 0.0, hi: Double = 1.0): Double = (hi - lo) * rand.nextDouble + lo
     def uniform(lo: Float, hi: Float): Float = (hi - lo) * rand.nextFloat + lo
@@ -17,18 +19,6 @@ object vec extends Logging { self =>
 //  def apply(x:V, y:V, z:V) = new vec3(x,y,z)
 //  def apply(a: (V,V,V)) = new vec3(a._1, a._2, a._3)
 
-  object mutable {
-    def apply(x: V, y: V) = new scalene.vector.mutable.vec2(x,y)
-    def apply(a: (V,V)) = new scalene.vector.mutable.vec2(a._1, a._2)
-//    def apply(x:V, y:V, z:V) = new vec3(x,y,z)
-//    def apply(a: (V,V,V)) = new vec3(a._1, a._2, a._3)
-  }
-  object immutable {
-    def apply(x: V, y: V) = new scalene.vector.immutable.vec2(x,y)
-    def apply(a: (V,V)) = new scalene.vector.immutable.vec2(a._1, a._2)
-//    def apply(x:V, y:V, z:V) = new vec3.immutable.vec3(x,y,z)
-//    def apply(a: (V,V,V)) = new vec3(a._1, a._2, a._3)
-  }
 
   /*** 2-D ***/
 
