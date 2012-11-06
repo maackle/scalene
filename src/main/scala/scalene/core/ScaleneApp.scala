@@ -84,7 +84,7 @@ with Logging {
     if(fullscreen) Display.setFullscreen(true)
     else Display.setDisplayMode(new DisplayMode(_winsize._1, _winsize._2))
     val pxfmt = new PixelFormat()
-    val ctxAttr = new ContextAttribs(3, 2)
+    val ctxAttr = new ContextAttribs(3, 0)
     ctxAttr.withForwardCompatible(true);
 //    contextAtrributes.withProfileCore(true);
     Display.create(pxfmt, ctxAttr)
