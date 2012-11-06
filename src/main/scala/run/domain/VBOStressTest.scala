@@ -11,7 +11,7 @@ import scalene.gfx.{Color, gl}
 import grizzled.slf4j.Logging
 import scalene.components._
 import maackle.util.Random
-import scalene.components.KeyHoldEvent
+import scalene.event.{EventHandler, KeyDownEvent, KeyEventSink, KeyHoldEvent}
 
 object VBOStressTest extends Domain(Run) { domain =>
 
@@ -37,7 +37,7 @@ object VBOStressTest extends Domain(Run) { domain =>
 
   class CircleTest extends State(Run) with Logging with KeyEventSink {
 
-    events += {
+    val handler = EventHandler {
       case KeyHoldEvent(KEY_MINUS) => Op { view.view.zoom *= 0.99 }
       case KeyHoldEvent(KEY_EQUALS) => Op { view.view.zoom *= 1.01 }
       case KeyDownEvent(KEY_SPACE) => Op { println(view.view.zoom) }

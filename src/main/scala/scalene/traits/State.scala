@@ -1,6 +1,5 @@
 package scalene.traits
 
-import scalene.components.EventSource
 import scalene.core.ScaleneApp
 
 

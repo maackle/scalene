@@ -7,8 +7,7 @@ import scalene.core.{Op, VBO}
 import scalene.vector.{vec2, vec}
 import org.lwjgl.opengl.GL11
 import scalene.gfx.{gl, Color}
-import scalene.components.KeyHoldEvent
-import scalene.components.KeyDownEvent
+import scalene.event.{EventHandler, KeyEventSink, KeyHoldEvent, KeyDownEvent}
 
 class LogoTest extends State(Run) with KeyEventSink {
 
@@ -17,7 +16,7 @@ class LogoTest extends State(Run) with KeyEventSink {
 
   view.view.zoom = 5
 
-  events += {
+  val handler = EventHandler {
     case KeyHoldEvent(KEY_MINUS) => Op { view.view.zoom *= 0.99 }
     case KeyHoldEvent(KEY_EQUALS) => Op { view.view.zoom *= 1.01 }
   }

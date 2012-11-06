@@ -2,7 +2,8 @@ package run.domain
 
 import scalene.traits._
 import run.Run
-import scalene.components.{Position2D, Position, KeyEventSource}
+import scalene.event.KeyEventSource
+import scalene.components.{Position2D, Position}
 import scalene.gfx._
 import scalene.vector.{vec2, vec}
 import scalene.misc.SolidBackground
