@@ -50,7 +50,7 @@ object SnailDomain extends Domain2D(Run) with Logging { domain =>
   val font = TTF("font/redhead.ttf", 100)
 
   val drawText = DrawOp {
-    font.drawString("press space", vec(10,10), Color.red)
+    font.drawString("press space", vec(10,10), Color.white)
   }
 
   val bg = new SolidBackground(Color(0.5f, 0.5f, 0.5f))
@@ -65,10 +65,21 @@ object SnailDomain extends Domain2D(Run) with Logging { domain =>
   object SnailState extends State(domain) with EventSink {
 
     this ++= snails
-    this += drawText
 
-    val view = ViewScheme.simple(bg.color, snails)
+//    val view = ViewScheme.simple(bg.color, drawText :: snails)
+    val view = new ViewSingle2D {
 
+      val view = new View2D {
+        zoom = 1
+        val layers = Vector(
+          new Layer2D(0)(List(bg)),
+          new Layer2D(1)(snails),
+          new Layer2D(1.1)(List(drawText))
+        )
+
+      }
+
+    }
     val eventSource = new KeyEventSource
 
     val handler = EventHandler {

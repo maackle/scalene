@@ -38,6 +38,7 @@ class TTF(path:String, size:Int, style:TTF.FontStyle.Plain.type) {
       (anchor.x/2 + .5f) * -w,
       (anchor.y/2 + .5f) * h
     )
+    Tex.clearTexID()
     gl.matrix {
       gl.translate(pos)
       gl.scale(scale, scale)

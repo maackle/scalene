@@ -34,6 +34,7 @@ class Tex(t:Texture) {
 //TODO: don't rely on singleton!
 object Tex {
   private var lastBoundId = -1
+  def clearTexID() = {lastBoundId = -1}
 }
 
 
