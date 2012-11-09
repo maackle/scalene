@@ -7,7 +7,6 @@ object Run extends {
 
   val windowSize = Some(600,600)
   val windowTitle = "SCALENE GAME"
-//  val startState = BlobDomain.PlayState
 
 } with ScaleneApp {
 

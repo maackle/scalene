@@ -7,12 +7,6 @@ import scalene.components.{Position2D, Position}
 import scalene.gfx._
 import scalene.vector.{vec2, vec}
 import scalene.misc.SolidBackground
-//
-//class InvisibleMan extends Thing with Update {
-//  def update() {
-//    println("I have a gold tooth!")
-//  }
-//}
 
 
 object BlobDomain extends Domain2D(Run) { domain =>
