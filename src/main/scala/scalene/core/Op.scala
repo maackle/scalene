@@ -1,6 +1,6 @@
 package scalene.core
 
-import scalene.traits.{Render, Thing}
+import traits.{Thing, Render}
 import scalene.gfx.gl
 import grizzled.slf4j.Logger
 

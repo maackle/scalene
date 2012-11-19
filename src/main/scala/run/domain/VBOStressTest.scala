@@ -1,17 +1,20 @@
 package run.domain
 
-import scalene.traits._
 import run.Run
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl._
 import scalene.vector.{vec2, vec}
 import java.nio.DoubleBuffer
-import scalene.core.{Op, VBO, DrawOp}
+import scalene.core._
 import scalene.gfx.{Color, gl}
 import grizzled.slf4j.Logging
 import scalene.components._
 import maackle.util.Random
-import scalene.event.{EventHandler, KeyDownEvent, KeyEventSink, KeyHoldEvent}
+import scalene.event._
+import scalene.input.LWJGLKeyboard
+import scalene.core.traits.{Thing, Update, Render}
+import scalene.event.KeyHoldEvent
+import scalene.event.KeyDownEvent
 
 object VBOStressTest extends Domain(Run) { domain =>
 
@@ -35,7 +38,7 @@ object VBOStressTest extends Domain(Run) { domain =>
     }
   }
 
-  class CircleTest extends State(Run) with Logging with KeyEventSink {
+  class CircleTest extends State(Run) with Logging with EventSink with LWJGLKeyboard {
 
     val handler = EventHandler {
       case KeyHoldEvent(KEY_MINUS) => Op { view.view.zoom *= 0.99 }

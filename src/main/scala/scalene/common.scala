@@ -5,9 +5,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException
 import grizzled.slf4j.Logger
 import org.lwjgl.Sys
 
-object common {
+package object common {
 
-  type R = Double
+  type Real = Double
 
   private var __onetimer = collection.mutable.Set[Op]()
 
@@ -34,5 +34,5 @@ object common {
     Logger("scalene").info("TODO: %s" format s)
   }
 
-  def px(a:Double):R = 1 / 100 * a
+  def px(a:Double):Real = 1 / 100 * a
 }

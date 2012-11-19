@@ -2,12 +2,12 @@ package run.domain
 
 import scalene._
 import components.Position2D
+import core.traits.Update
 import event._
-import core.{Op, Resource, DrawOp}
+import core._
 import event.KeyDownEvent
 import gfx._
 import misc.SolidBackground
-import traits._
 import grizzled.slf4j.{Logger, Logging}
 import vector._
 import run.Run
@@ -16,6 +16,7 @@ import maackle.util.Random
 
 import scalene.input.LWJGLKeyboard
 import org.lwjgl.opengl.GL11
+import scala.PartialFunction
 
 trait Spirally
 extends EventSink
@@ -56,7 +57,7 @@ object SnailDomain extends Domain2D(Run) with Logging { domain =>
   val bg = new SolidBackground(Color(0.5f, 0.5f, 0.5f))
 
   val snails = (
-    (List.range(1,200) map { _:Int => new Snail(vec.polar.random(300)) } ) :::
+    (List.range(1,1000) map { _:Int => new Snail(vec.polar.random(300)) } ) :::
     Nil
   )
 

@@ -7,7 +7,7 @@ import scalene._
 import scalene.vector._
 
 trait PrimitiveDrawing extends gl {
-
+  type R = common.Real
   type Vertex = (V,V)
   type VertexList = Array[Vertex]
   type VecList = Array[Vec2]
@@ -84,6 +84,15 @@ trait PrimitiveDrawing extends gl {
   }
   def vector(pair:(vec2,vec2)) {
     line((pair._1, pair._1 + pair._2))
+  }
+  def rect(pos:vec2, w:common.Real, h:common.Real) {
+    gl.fill(true)
+    gl.begin(GL_POLYGON) {
+      gl.vertex(pos)
+      gl.vertex(pos + vec(0, h))
+      gl.vertex(pos + vec(w, h))
+      gl.vertex(pos + vec(w, 0))
+    }
   }
 }
 

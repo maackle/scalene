@@ -1,8 +1,5 @@
 package org.newdawn.slick;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.newdawn.slick.opengl.ImageData;
 import org.newdawn.slick.opengl.InternalTextureLoader;
 import org.newdawn.slick.opengl.Texture;
@@ -11,6 +8,9 @@ import org.newdawn.slick.opengl.pbuffer.GraphicsFactory;
 import org.newdawn.slick.opengl.renderer.Renderer;
 import org.newdawn.slick.opengl.renderer.SGL;
 import org.newdawn.slick.util.Log;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * An image loaded from a file and renderable to the canvas
@@ -36,7 +36,7 @@ public class Image implements Renderable {
 	public static final int FILTER_LINEAR = 1;
 	/** Use Nearest Filtering */
 	public static final int FILTER_NEAREST = 2;
-	
+
 	/** The OpenGL texture for this image */
 	protected Texture texture;
 	/** The width of the image */
@@ -1400,4 +1400,5 @@ public class Image implements Renderable {
 	public void flushPixelData() {
 		pixelData = null;
 	}
+
 }

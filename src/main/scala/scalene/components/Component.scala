@@ -2,7 +2,7 @@ package scalene.components
 
 import scalene.vector._
 import scalene.common
-import scalene.traits.InternalTransform
+import scalene.core.traits.{Simulate, Update, InternalTransform}
 import scalene.gfx.Transform
 
 trait Component
@@ -14,9 +14,10 @@ trait Position2D extends Component {
 trait PositionXY extends Position2D {
   def x = position.x
   def y = position.y
-  def x_=(v:common.R) { position.x = v}
-  def y_=(v:common.R) { position.y = v}
+  def x_=(v:common.Real) { position.x = v}
+  def y_=(v:common.Real) { position.y = v}
 }
+
 
 trait Rotation {
   def rotation: Radian
@@ -29,11 +30,27 @@ trait Scaling2D {
 trait Rigid2D extends InternalTransform with Position2D with Rotation {
   val __transform = Transform.dynamic(()=>position, null, ()=>rotation)
 }
+
 trait Affine2D extends InternalTransform with Position2D with Rotation with Scaling2D {
   val __transform = Transform.dynamic(()=>position, ()=>scale, ()=>rotation)
 }
 
 trait Velocity extends Component { def velocity: vec }
-trait Velocity2D extends Component { def velocity: vec2 }
+trait Velocity2D extends Component with Position2D with Simulate {
+  def velocity: vec2
+  override def __simulate(dt:common.Real) {
+    position += velocity * dt
+    super.__simulate(dt)
+  }
+}
+
+trait Acceleration extends Component { def acceleration: vec }
+trait Acceleration2D extends Component with Velocity2D {
+  def accel: vec2
+  override def __simulate(dt:common.Real) {
+    velocity += accel * dt
+    super.__simulate(dt)
+  }
+}
 
 trait Collider extends Position2D

@@ -1,3 +1,5 @@
 package scalene.audio
 
-trait SoundStore
+class SoundStore {
+
+}

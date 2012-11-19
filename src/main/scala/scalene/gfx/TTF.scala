@@ -12,6 +12,7 @@ import scalene.core.Resource
 import grizzled.slf4j.Logging
 import java.io.File
 import java.awt
+import org.lwjgl.opengl.GL11
 
 class TTF(path:String, size:Int, style:TTF.FontStyle.Plain.type) {
 
@@ -38,7 +39,9 @@ class TTF(path:String, size:Int, style:TTF.FontStyle.Plain.type) {
       (anchor.x/2 + .5f) * -w,
       (anchor.y/2 + .5f) * h
     )
-    Tex.clearTexID()
+
+    Tex.bindNone()
+
     gl.matrix {
       gl.translate(pos)
       gl.scale(scale, scale)
@@ -46,6 +49,7 @@ class TTF(path:String, size:Int, style:TTF.FontStyle.Plain.type) {
       gl.scale(1,-1)
       uni.drawString(0, 0, what, color.toSlick )
     }
+    GL11.glDisable(GL_TEXTURE_2D) // TODO: why is this necessary? (it is, don't remove until you understand!)
   }
 
 }

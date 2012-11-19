@@ -10,5 +10,5 @@ object Run extends {
 
 } with ScaleneApp {
 
-  lazy val startState = SnailDomain.SnailState
+  lazy val startState = new Tomboy.PlayTomboy
 }

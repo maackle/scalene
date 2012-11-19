@@ -24,17 +24,21 @@ class Tex(t:Texture) {
   val (getTextureWidth, getTextureHeight) = (t.getTextureWidth, t.getTextureHeight)
   val id = t.getTextureID
   def bind() {
-    if(Tex.lastBoundId != id) {
+    if(Tex.lastBound != t) {
       glBindTexture(GL_TEXTURE_2D, t.getTextureID)
-      Tex.lastBoundId = id
+      Tex.lastBound = t
     }
   }
 }
 
 //TODO: don't rely on singleton!
 object Tex {
-  private var lastBoundId = -1
-  def clearTexID() = {lastBoundId = -1}
+  private var _lastBound:Texture = null
+  def bindNone() { _lastBound = null }
+  def lastBound = TextureImpl.getLastBind
+  def lastBound_=(t:Texture) { TextureImpl.bindByForce(t) }
+
+//  private var lastBoundId = -1
 }
 
 

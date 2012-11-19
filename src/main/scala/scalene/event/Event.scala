@@ -5,9 +5,10 @@ import scalene.input.{LWJGLKeyboard}
 import scalene.core.Op
 import scalene.helpers.MemBoolean
 import org.lwjgl.input.{Keyboard=>Kbd}
-import scalene.traits.{Thing, Update, Execute}
+import scalene.core.traits.{Thing, Execute, Update}
 import collection.mutable
 import grizzled.slf4j.{Logger, Logging}
+import scalene.vector.vec2
 
 object Event {
   type Id = Int
@@ -18,13 +19,19 @@ trait Event {
   def code:Event.Id
 }
 
-trait KeyEvent extends Event {
-
-}
+trait KeyEvent extends Event
 
 case class KeyHoldEvent(code:Int) extends KeyEvent
 case class KeyDownEvent(code:Int) extends KeyEvent
 case class KeyUpEvent(code:Int) extends KeyEvent
+
+trait MouseEvent extends Event {
+  def position:vec2
+}
+
+case class MouseDownEvent(code:Int, position:vec2) extends MouseEvent
+case class MouseUpEvent(code:Int, position:vec2) extends MouseEvent
+case class MouseHoldEvent(code:Int, position:vec2) extends MouseEvent
 
 trait EventSource[+Unused <: Event] extends Thing with Update with Logging { self =>
   protected def raise(ev:Event) {
@@ -37,7 +44,7 @@ trait EventSource[+Unused <: Event] extends Thing with Update with Logging { sel
   def presentTo(sink:EventSink) {
     for {
       ev <- eventQueue
-      op <- sink.handler.consume(ev)
+      op <- sink.handler.consumeImmediately(ev)
     } {
       debug("event consumed: %s %s" format (ev, op) )
     }
@@ -73,31 +80,34 @@ class KeyEventSource extends EventSource[KeyEvent] {
   }
 }
 
-object EventHandler {
-  type HandlerFn[E <: Event] = PartialFunction[E, Op]
-  lazy val empty:HandlerFn[Event] = {
-    case Event.Null => Op.NOOP
-  }
+class MouseEventSource extends EventSource[MouseEvent] {
+
+  def update() = ???
+
 }
 
-case class EventHandler(val fn:EventHandler.HandlerFn[Event]) {
+object EventHandler {
+  type HandlerFn = PartialFunction[Event, Any]
 
-  def consume[A <: Event](ev:A) = {
-    fn.lift(ev) map { op =>
-      Logger("EventHandler").debug("consumed %s and got: %s" format(ev, op))
-      op()
+  def apply(fn:PartialFunction[Event, Any]) = new EventHandler(fn)
+}
+
+class EventHandler(val fn:EventHandler.HandlerFn) {
+
+  def consumeImmediately[A <: Event](ev:A) = {
+    fn.lift(ev) map {
+      case op:Op => op()
+      case _ =>
     }
   }
+
 }
 
 object EventSinkSpecific {
-  type HandlerFn[E <: Event] = PartialFunction[E, Op]
-  lazy val empty:HandlerFn[Event] = {
-    case Event.Null => Op.NOOP
-  }
+
 }
 
-trait EventSinkSpecific[+E <: Event] extends Thing {
+trait EventSinkSpecific[E <: Event] extends Thing {
   import EventSinkSpecific._
   def handler:EventHandler
 
@@ -105,12 +115,19 @@ trait EventSinkSpecific[+E <: Event] extends Thing {
 
 trait EventSink extends EventSinkSpecific[Event] {
 
+  implicit def fn2handler(fn:EventHandler.HandlerFn) = EventHandler(fn)
 
 }
 
 trait KeyEventSink extends EventSinkSpecific[KeyEvent] with LWJGLKeyboard {
   //  def consume(source:EventSource) = source.presentTo(this)
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
 
 /* TODO:
 Message-style event triggering, instead of global events that all can hear

@@ -5,7 +5,6 @@ import scalene.gfx.{GLSettings, Image, gl, Color}
 import org.lwjgl.BufferUtils
 import java.nio.{IntBuffer, FloatBuffer}
 import scalene.vector._
-import scalene.traits._
 import maackle.util.getStream
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.util.glu.GLU
@@ -16,8 +15,9 @@ import scalene.gfx.GLSettings
 import scalene.input.LWJGLKeyboard
 import scalene.event.{Event, KeyEventSource, EventSource}
 import scalene.helpers.{MemDouble, MemInt}
-import scalene.traits.State.StateMachine
 import scalene.helpers.MemDouble
+import traits.Initialize
+import scalene.core.State.StateMachine
 
 //trait ScaleneInnerClasses { app:ScaleneApp => }
 
@@ -40,6 +40,10 @@ with Logging {
   private var _loopTime = MemDouble(32)
 
   private def _winsize = windowSize.get
+
+  def currentWindowSize = {
+    (Display.getWidth, Display.getHeight)
+  }
 
   private val _eventSources = collection.mutable.Set[EventSource[Event]](
     new KeyEventSource
@@ -83,9 +87,8 @@ with Logging {
     Display.setVSyncEnabled(vsync)
     if(fullscreen) Display.setFullscreen(true)
     else Display.setDisplayMode(new DisplayMode(_winsize._1, _winsize._2))
-    val pxfmt = new PixelFormat()
-    val ctxAttr = new ContextAttribs(3, 0)
-    ctxAttr.withForwardCompatible(true);
+    val pxfmt = new PixelFormat().withDepthBits(24).withSamples(4).withSRGB(true)
+    val ctxAttr = new ContextAttribs(3, 0)//.withForwardCompatible(true);
 //    contextAtrributes.withProfileCore(true);
     Display.create(pxfmt, ctxAttr)
     info("Display created")

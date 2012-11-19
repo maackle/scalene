@@ -8,7 +8,7 @@ import org.lwjgl.BufferUtils
 import scalene.vector.vec
 import scalene.vector.vec2
 import java.nio.{FloatBuffer, IntBuffer, DoubleBuffer, Buffer}
-import scalene.traits.{Thing, Render}
+import traits.{Render, Thing}
 import scala.Some
 import grizzled.slf4j.Logger
 

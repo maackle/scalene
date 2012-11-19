@@ -1,12 +1,13 @@
 package run.domain
 
-import scalene.traits._
 import run.Run
 import scalene.event.KeyEventSource
 import scalene.components.{Position2D, Position}
 import scalene.gfx._
 import scalene.vector.{vec2, vec}
 import scalene.misc.SolidBackground
+import scalene.core.traits.{Thing, Update, Render, InternalTransform}
+import scalene.core.{ViewSingle2D, View2D, State, Domain2D}
 
 
 object BlobDomain extends Domain2D(Run) { domain =>

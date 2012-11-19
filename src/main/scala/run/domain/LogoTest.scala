@@ -1,13 +1,14 @@
 package run.domain
 
 import run.Run
-import scalene.traits.{ViewScheme, Update, Thing, State}
+import scalene.core.traits.{Thing, Update}
 import scalene.components._
-import scalene.core.{Op, VBO}
+import scalene.core.{ViewScheme, State, Op, VBO}
 import scalene.vector.{vec2, vec}
 import org.lwjgl.opengl.GL11
 import scalene.gfx.{gl, Color}
-import scalene.event.{EventHandler, KeyEventSink, KeyHoldEvent, KeyDownEvent}
+import scalene.event._
+import scalene.event.KeyHoldEvent
 
 class LogoTest extends State(Run) with KeyEventSink {
 
