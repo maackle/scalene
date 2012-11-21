@@ -22,7 +22,7 @@ trait ThingStore extends Thing {
 
   def update() {
     val us = updateables
-    val sinks:Set[EventSink] = (updateables+this) flatMap {
+    val sinks:Set[EventSink] = (updateables + this) flatMap {
       case s:EventSink => Some(s)
       case _ => None
     }

@@ -3,7 +3,7 @@ package run.domain
 import run.Run
 import scalene.core.traits.{Thing, Update}
 import scalene.components._
-import scalene.core.{ViewScheme, State, Op, VBO}
+import scalene.core.{View2D, State, Op, VBO}
 import scalene.vector.{vec2, vec}
 import org.lwjgl.opengl.GL11
 import scalene.gfx.{gl, Color}
@@ -13,13 +13,13 @@ import scalene.event.KeyHoldEvent
 class LogoTest extends State(Run) with KeyEventSink {
 
   val logos = for(i <- Array.range(0,1)) yield new Logo(vec(0,0))
-  val view = ViewScheme.simple(Color.gray, logos)
+  val view = View2D.simple(Color.gray, logos)
 
-  view.view.zoom = 5
+  view.zoom = 5
 
   val handler = EventHandler {
-    case KeyHoldEvent(KEY_MINUS) => Op { view.view.zoom *= 0.99 }
-    case KeyHoldEvent(KEY_EQUALS) => Op { view.view.zoom *= 1.01 }
+    case KeyHoldEvent(KEY_MINUS) => Op { view.zoom *= 0.99 }
+    case KeyHoldEvent(KEY_EQUALS) => Op { view.zoom *= 1.01 }
   }
 
   object Logo {

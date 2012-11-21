@@ -41,9 +41,9 @@ object VBOStressTest extends Domain(Run) { domain =>
   class CircleTest extends State(Run) with Logging with EventSink with LWJGLKeyboard {
 
     val handler = EventHandler {
-      case KeyHoldEvent(KEY_MINUS) => Op { view.view.zoom *= 0.99 }
-      case KeyHoldEvent(KEY_EQUALS) => Op { view.view.zoom *= 1.01 }
-      case KeyDownEvent(KEY_SPACE) => Op { println(view.view.zoom) }
+      case KeyHoldEvent(KEY_MINUS) => Op { view.zoom *= 0.99 }
+      case KeyHoldEvent(KEY_EQUALS) => Op { view.zoom *= 1.01 }
+      case KeyDownEvent(KEY_SPACE) => Op { println(view.zoom) }
     }
 
     val N = 5000
@@ -54,7 +54,7 @@ object VBOStressTest extends Domain(Run) { domain =>
 
     this ++= circles
 
-    val view = ViewScheme.simple(Color.hsv(0.5f,0.1f,0.5f), circles)
+    val view = View2D.simple(Color.hsv(0.5f,0.1f,0.5f), circles)
   }
 
 }

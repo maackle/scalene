@@ -44,7 +44,7 @@ class Snail(pos:vec2) extends Sprite(Snail.im, pos, vec2.one*2) with Spirally {
   }
 }
 
-object SnailDomain extends Domain2D(Run) with Logging { domain =>
+object SnailDomain extends Domain(Run) with Logging { domain =>
 
   val snail = new Snail(vec2.zero)
 
@@ -54,7 +54,7 @@ object SnailDomain extends Domain2D(Run) with Logging { domain =>
     font.drawString("press space", vec(10,10), Color.white)
   }
 
-  val bg = new SolidBackground(Color(0.5f, 0.5f, 0.5f))
+  val bgColor = Color(0.5f, 0.5f, 0.5f)
 
   val snails = (
     (List.range(1,1000) map { _:Int => new Snail(vec.polar.random(300)) } ) :::
@@ -63,29 +63,21 @@ object SnailDomain extends Domain2D(Run) with Logging { domain =>
 
 
   //TODO: make it easy to copy() a state and change a few things
-  object SnailState extends State(domain) with EventSink {
+  object SnailState extends State(domain.app) with EventSink {
 
     this ++= snails
 
-//    val view = ViewScheme.simple(bg.color, drawText :: snails)
-    val view = new ViewSingle2D {
+    val view = View2D(bgColor)(
+      Layer2D(1, snails),
+      Layer2D(1.1, drawText)
+    )
 
-      val view = new View2D {
-        zoom = 1
-        val layers = Vector(
-          new Layer2D(0)(List(bg)),
-          new Layer2D(1)(snails),
-          new Layer2D(1.1)(List(drawText))
-        )
 
-      }
-
-    }
     val eventSource = new KeyEventSource
 
     val handler = EventHandler {
-      case event.KeyHoldEvent(LWJGLKeyboard.KEY_EQUALS) => Op( view.view.zoom /= 0.99 )
-      case event.KeyHoldEvent(LWJGLKeyboard.KEY_MINUS) => Op( view.view.zoom *= 0.99 )
+      case event.KeyHoldEvent(LWJGLKeyboard.KEY_EQUALS) => Op( view.zoom /= 0.99 )
+      case event.KeyHoldEvent(LWJGLKeyboard.KEY_MINUS) => Op( view.zoom *= 0.99 )
     }
 
     val sound = None

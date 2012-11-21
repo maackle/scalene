@@ -42,22 +42,12 @@ trait Execute {
 }
 
 trait Initialize {
-
-  private var initializeOps = ListSet[Op]()
-  private var cleanupOps = ListSet[Op]()
-  protected def doInitialize() {
-    initializeOps foreach { op => op() }
-  }
-  protected def doCleanup() {
-    cleanupOps foreach { op => op() }
-  }
-
-  protected def initialize(bloc: =>Unit) {
-    initializeOps += Op( bloc )
-  }
-  protected def cleanup(bloc: =>Unit) {
-    cleanupOps += Op( bloc )
-  }
+//  private var _isInitialized_? = false
+//  protected def initialize() {
+//    if(!_isInitialized_?)
+//    _isInitialized_? = true
+//  }
+  protected def initialize()
 }
 
 trait InternalTransform extends Render {

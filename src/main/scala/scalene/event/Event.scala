@@ -2,7 +2,7 @@ package scalene.event
 
 import scalene.common._
 import scalene.input.{LWJGLKeyboard}
-import scalene.core.Op
+import scalene.core.{View2D, State, Op}
 import scalene.helpers.MemBoolean
 import org.lwjgl.input.{Keyboard=>Kbd}
 import scalene.core.traits.{Thing, Execute, Update}
@@ -86,20 +86,59 @@ class MouseEventSource extends EventSource[MouseEvent] {
 
 }
 
-object EventHandler {
-  type HandlerFn = PartialFunction[Event, Any]
+trait HandyHandlers extends EventSink {
 
-  def apply(fn:PartialFunction[Event, Any]) = new EventHandler(fn)
+  def view:View2D
+
+  import LWJGLKeyboard._
+
+  def zoomer(ratio:Real)(out:Int=KEY_MINUS, in:Int=KEY_EQUALS) = {
+    val amt = if(ratio < 1) 1 / ratio else ratio
+    EventHandler {
+      case KeyHoldEvent(`out`)  => view.zoom /= amt
+      case KeyHoldEvent(`in`)   => view.zoom *= amt
+    }
+  }
+
+  def panner(pixels:Real)(up:Int=KEY_W, left:Int=KEY_A, down:Int=KEY_S, right:Int=KEY_D) = EventHandler {
+    case KeyHoldEvent(`left`)   => view.scroll.x -= pixels
+    case KeyHoldEvent(`right`)  => view.scroll.x += pixels
+    case KeyHoldEvent(`down`)   => view.scroll.y -= pixels
+    case KeyHoldEvent(`up`)     => view.scroll.y += pixels
+  }
+
+  def spinner(degrees:Real)(ccw:Int, cw:Int) = {
+    val rads = deg2rad(degrees)
+    EventHandler {
+      case KeyHoldEvent(`cw`)   => {
+        view.rotation -= rads
+      }
+      case KeyHoldEvent(`ccw`)  => {
+        view.rotation += rads
+      }
+    }
+  }
 }
 
-class EventHandler(val fn:EventHandler.HandlerFn) {
+object EventHandler {
+  type Partial = PartialFunction[Event, Any]
+  type Lifted = Function[Event, Option[Any]]
+
+  def apply(fn:Partial) = new EventHandler(fn.lift)
+}
+
+class EventHandler(val fn:EventHandler.Lifted) {
 
   def consumeImmediately[A <: Event](ev:A) = {
-    fn.lift(ev) map {
+    fn(ev) map {
       case op:Op => op()
       case _ =>
     }
   }
+
+  def ++(other:EventHandler) = new EventHandler( ev => {
+    fn(ev).orElse(other.fn(ev))
+  })
 
 }
 
@@ -115,7 +154,7 @@ trait EventSinkSpecific[E <: Event] extends Thing {
 
 trait EventSink extends EventSinkSpecific[Event] {
 
-  implicit def fn2handler(fn:EventHandler.HandlerFn) = EventHandler(fn)
+  implicit def fn2handler(fn:EventHandler.Partial) = EventHandler(fn)
 
 }
 

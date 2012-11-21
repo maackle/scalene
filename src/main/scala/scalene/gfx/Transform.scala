@@ -21,16 +21,19 @@ object Transform {
       bloc
     }
   }
+
+  //TODO: get the order right -- also, something weird is happening where half a rotation = a full rotation ?!
   @inline def inject(translate: vec2, scale: vec2, rotate: Radian) {
+
     if(translate!=null) gl.translate(translate)
-    if(rotate!=0)       gl.rotate(rotate)
     if(scale!=null)     gl.scale(scale)
+    if(rotate!=0)       gl.rotateRad(rotate)
   }
   @inline def inject(translate: ()=>vec2, scale: ()=>vec2, rotate: ()=>Radian) {
-    if(translate!=null) gl.translate(translate())
-    if(rotate!=null)      gl.rotate(rotate())
-    if(scale!=null)     gl.scale(scale())
 
+    if(translate!=null) gl.translate(translate())
+    if(scale!=null)     gl.scale(scale())
+    if(rotate!=null)    gl.rotateRad(rotate())
   }
 
 }

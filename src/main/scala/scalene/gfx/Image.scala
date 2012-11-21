@@ -6,18 +6,23 @@ import maackle.util._
 import scalene.vector.{vec, vec2}
 import scalene.core.Resource
 
+//class TooNiceImage(val tex:Tex, cliprect:ClipRect = null, centerPos:vec2 = null) extends SubTexture {
+//  lazy val clip = if(cliprect==null) ClipRect(0,0,texWidth,texHeight) else cliprect
+//  val (width, height) = (clip.w, clip.h)
+//  val center = if(centerPos==null) vec(width/2, height/2) else centerPos
+//
+//  def render() {
+//    gl.matrix {
+//      gl.translate(-center)
+//      blit()
+//    }
+//  }
+//}
 
-class Image(val tex:Tex, cliprect:ClipRect = null, centerPos:vec2 = null) extends SubTexture {
-  lazy val clip = if(cliprect==null) ClipRect(0,0,texWidth,texWidth) else cliprect
+class Image(val tex:Tex, cliprect:ClipRect = null) extends SubTexture {
+  lazy val clip = if(cliprect==null) ClipRect(0,0,texWidth,texHeight) else cliprect
   val (width, height) = (clip.w, clip.h)
-  val center = if(centerPos==null) vec(width/2, width/2) else centerPos
-
-  def render() {
-    gl.matrix {
-      gl.translate(-center)
-      blit()
-    }
-  }
+  def render() { blit() }
 }
 
 object Image {

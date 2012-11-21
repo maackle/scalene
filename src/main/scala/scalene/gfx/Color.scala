@@ -1,6 +1,5 @@
 package scalene.gfx
 
-import util._
 import collection.mutable
 import org.newdawn.slick
 import org.lwjgl.opengl.GL11.glColor4f

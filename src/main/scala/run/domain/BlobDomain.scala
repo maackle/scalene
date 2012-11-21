@@ -7,10 +7,10 @@ import scalene.gfx._
 import scalene.vector.{vec2, vec}
 import scalene.misc.SolidBackground
 import scalene.core.traits.{Thing, Update, Render, InternalTransform}
-import scalene.core.{ViewSingle2D, View2D, State, Domain2D}
+import scalene.core.{Layer2D, View2D, State, Domain}
 
 
-object BlobDomain extends Domain2D(Run) { domain =>
+object BlobDomain extends Domain(Run) { domain =>
 
   class Blob(val position:vec2) extends Thing with Position2D with Update with Render with InternalTransform {
 
@@ -29,6 +29,7 @@ object BlobDomain extends Domain2D(Run) { domain =>
   }
 
   object PlayState extends State(domain) {
+
     val N = 2000
     val n = math.sqrt(N).toInt
     val transform = Transformer2D.identity
@@ -40,18 +41,14 @@ object BlobDomain extends Domain2D(Run) { domain =>
 
     this ++= blobs
 
-    val view = new ViewSingle2D {
-
-      val view = new View2D {
-        zoom = 2
-        val layers = Vector(
-          new Layer2D(0)(new SolidBackground(Color.gray) :: Nil),
-          new Layer2D(1)(blobs),
-          new Layer2D(0.8)(blobs),
-          new Layer2D(0.6)(blobs)
-        )
-
-      }
+    val view = new View2D {
+      zoom = 2
+      val layers = Vector(
+        new Layer2D(0)(new SolidBackground(Color.gray) :: Nil),
+        new Layer2D(1)(blobs),
+        new Layer2D(0.8)(blobs),
+        new Layer2D(0.6)(blobs)
+      )
 
     }
 

@@ -1,8 +1,11 @@
 package scalene.gfx
 
 import scalene.core.traits.{Update, Render}
-import scalene.vector.vec2
+import scalene.vector.{vec, vec2}
 import scalene.gfx.SpriteAnimation.FrameOptions
+import scalene.core.Resource
+import scalene.common.{milliseconds => millis}
+import scalene.common
 
 trait Animation extends Render with Update {
   object Mode extends Enumeration {
@@ -17,38 +20,48 @@ trait Animation extends Render with Update {
 object SpriteAnimation {
 
   case class FrameOptions(durationMs:Int, offset:vec2=vec2.zero)
+
+  val a = (FrameOptions.apply _).tupled
 }
 
 trait ImageAnimation extends Animation {
-  def frames:Map[Image, FrameOptions]
-  def images:IndexedSeq[Image]
+  def frames:Map[Resource[Image], FrameOptions]
+  def images:IndexedSeq[Resource[Image]]
 }
 
-class SpriteAnimation(var position:vec2, f:(Image, FrameOptions)*) extends SpriteLike with ImageAnimation {
+class SpriteAnimation(var position:vec2, f:(Resource[Image], FrameOptions)*) extends SpriteLike with ImageAnimation {
 
   var scale = vec2.one
 
-  def this(position:vec2, images:Seq[Image], durationMs:Int) = this(position, {
-    val opt = FrameOptions(durationMs, vec2.zero)
+  def this(position:vec2, images:Seq[Resource[Image]], durationMs:Int, offset:vec2=null) = this(position, {
+    val opt = FrameOptions(durationMs, offset)
     images.map((_, opt))
   } : _*)
 
-  val images = f.map(_._1).toIndexedSeq
-  val frames = f.toMap
+  lazy val images = f.map(_._1).toIndexedSeq
+  lazy val frames = f.toMap
+
+  private val numFrames = images.size
 
   private var mode = Mode.Loop
   private var currentIndex = 0
+//  private var currentOptions:FrameOptions = _
   private var direction = 1
-  private val numFrames = images.size
   private var advance = true
+  private var lastAdvance = millis
 
-  def image = images(currentIndex)
+  def image = {
+    images(currentIndex).is
+  }
+  //TODO: optimize
+  def frame = frames(images(currentIndex))
+  def imageOffset = if(frame.offset==null) vec(image.width/2, image.height/2) else frame.offset
 
   def play() { advance = true }
   def pause() { advance = false }
 
   def update() {
-    if(advance) {
+    if(advance && millis - lastAdvance > frame.durationMs) {
       mode match {
         case Mode.Once => if(currentIndex < numFrames - 1) currentIndex += 1
         case Mode.Loop =>
@@ -57,6 +70,7 @@ class SpriteAnimation(var position:vec2, f:(Image, FrameOptions)*) extends Sprit
           currentIndex = (currentIndex + direction) % numFrames
           direction = -direction
       }
+      lastAdvance = millis
     }
   }
 }

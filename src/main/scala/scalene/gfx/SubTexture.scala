@@ -13,8 +13,8 @@ trait SubTexture extends Textured {
 
   lazy protected val (texWidth, texHeight) = (tex.getImageWidth, tex.getImageHeight)
   lazy protected val (paddedWidth, paddedHeight) = (tex.getTextureWidth.toFloat, tex.getTextureHeight.toFloat)
-  lazy protected val (tw, th) = (clip.w / paddedWidth, clip.h / paddedWidth )
-  lazy private val (tx0, ty0) = (clip.x / paddedWidth, clip.y / paddedWidth)
+  lazy protected val (tw, th) = (clip.w / paddedWidth, clip.h / paddedHeight )
+  lazy private val (tx0, ty0) = (clip.x / paddedWidth, clip.y / paddedHeight)
   lazy private val (tx1, ty1) = (tx0 + tw, ty0 + th)
 
   lazy val texCoords = Array(

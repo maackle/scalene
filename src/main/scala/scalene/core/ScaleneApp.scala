@@ -1,23 +1,16 @@
 package scalene.core
 
 import scalene.common._
-import scalene.gfx.{GLSettings, Image, gl, Color}
-import org.lwjgl.BufferUtils
-import java.nio.{IntBuffer, FloatBuffer}
-import scalene.vector._
-import maackle.util.getStream
+import scalene.gfx.{Color, gl, GLSettings}
 import org.lwjgl.opengl.GL11._
-import org.lwjgl.util.glu.GLU
 import org.lwjgl.opengl._
-import org.newdawn.slick.opengl.{TextureImpl, TextureLoader, Texture}
 import grizzled.slf4j.Logging
-import scalene.gfx.GLSettings
 import scalene.input.LWJGLKeyboard
 import scalene.event.{Event, KeyEventSource, EventSource}
-import scalene.helpers.{MemDouble, MemInt}
 import scalene.helpers.MemDouble
 import traits.Initialize
 import scalene.core.State.StateMachine
+import scalene.common
 
 //trait ScaleneInnerClasses { app:ScaleneApp => }
 
@@ -38,6 +31,7 @@ with Logging {
   protected lazy val stateMachine = new StateMachine(startState)
   private var _tick = 0
   private var _loopTime = MemDouble(32)
+  private var _startupTime = 0.0
 
   private def _winsize = windowSize.get
 
@@ -63,11 +57,12 @@ with Logging {
     1000 / _loopTime.now
   }
   def ticks = _tick
+  def millis:Int = (common.milliseconds - _startupTime).toInt
 
   delayedInit {
 
     info("starting up at %s" format msecsStartup)
-    doInitialize()
+    initialize()
     var _ms = milliseconds
     while(!org.lwjgl.input.Keyboard.isKeyDown(LWJGLKeyboard.KEY_ESCAPE)) {
       loopBody()
@@ -79,10 +74,10 @@ with Logging {
       if(_tick % 100 == 0) println("FPS: %s %s" format (avgFPS, lastFPS))
       Display.sync(fps)
     }
-    doCleanup()
+    cleanup()
   }
 
-  initialize {
+  def initialize() {
     Display.setTitle(windowTitle)
     Display.setVSyncEnabled(vsync)
     if(fullscreen) Display.setFullscreen(true)
@@ -94,14 +89,15 @@ with Logging {
     info("Display created")
     info("bpp: " + Display.getDisplayMode.getBitsPerPixel)
 
-    Resource.startAutoload(true) // as soon as the display is initialized we can load resources
+    // as soon as the display is initialized we can load resources
+    Resource.beginAutoloading()
 
     GLSettings.defaults()
     GLSettings.orthographic()
 
   }
 
-  cleanup {
+  def cleanup() {
     Display.destroy()
   }
 

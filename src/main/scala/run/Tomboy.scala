@@ -7,7 +7,7 @@ import scalene.vector.{vec, vec2}
 import org.lwjgl.opengl.GL11
 import scalene.event._
 import scalene.input.LWJGLKeyboard
-import scalene.core.{Domain, ViewScheme, State, Op}
+import scalene.core.{View2D, Domain, State, Op}
 import scalene.event.KeyHoldEvent
 import scalene.event.KeyDownEvent
 import run.Tomboy.{Boy, Arena}
@@ -107,7 +107,7 @@ object Tomboy extends Domain(run.Run) {
 
   }
 
-  class PlayTomboy extends State(run.Run) {
+  class PlayTomboy extends State(run.Run) with HandyHandlers {
 
     def simulate(dt:common.Real) = {
       boys.foreach{ b =>
@@ -131,7 +131,12 @@ object Tomboy extends Domain(run.Run) {
 
     this ++= boys
 
-    val view = ViewScheme.simple(Color(0xC7E2C3), drawables)
+    val handler = (
+      zoomer(0.99)(KEY_MINUS, KEY_EQUALS)
+      ++ panner(4)(KEY_W, KEY_A, KEY_S, KEY_D)
+    )
+
+    val view = View2D.simple(Color(0xC7E2C3), drawables)
     //Color(0xC7E2C3)
   }
 

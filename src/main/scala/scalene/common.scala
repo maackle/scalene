@@ -11,8 +11,10 @@ package object common {
 
   private var __onetimer = collection.mutable.Set[Op]()
 
+  private def _milliseconds = ((Sys.getTime * 1000) / Sys.getTimerResolution)
+  private var _milliseconds0 = _milliseconds
   def milliseconds: Double = {
-    ((Sys.getTime * 1000) / Sys.getTimerResolution)
+    _milliseconds - _milliseconds0
   }
 
   object implicits {
@@ -22,7 +24,7 @@ package object common {
 
   def once(bloc: =>Unit) = {
     val op = Op(bloc)
-    if(__onetimer contains op) {
+    if(! __onetimer.contains(op)) {
       op()
       __onetimer += op
     }
@@ -33,6 +35,9 @@ package object common {
   def TODO(s:String) = once {
     Logger("scalene").info("TODO: %s" format s)
   }
+
+  def deg2rad(deg:Real) = deg * math.Pi / 180
+  def rad2deg(rad:Real) = rad * 180 / math.Pi
 
   def px(a:Double):Real = 1 / 100 * a
 }

@@ -61,8 +61,10 @@ trait gl {
   @inline def scale(sx: Double, sy: Double) { glScaled(sx, sy, 1) }
   @inline def scale(s:vec2) { scale(s.x, s.y) }
 
-  @inline def rotate(t: Float) { glRotatef(t.toDegrees, 0, 0, -1) }
-  @inline def rotate(t: Double) { glRotated(t.toDegrees, 0, 0, -1) }
+  @inline def rotateRad(t: Float) { glRotatef(t.toDegrees, 0, 0, 1) }
+  @inline def rotateRad(t: Double) { glRotated(t.toDegrees, 0, 0, 1) }
+  @inline def rotateDeg(t: Float) { glRotatef(t, 0, 0, 1) }
+  @inline def rotateDeg(t: Double) { glRotated(t, 0, 0, 1) }
 
   @inline def vertex(v: vec2) { vertex(v.x, v.y) }
   @inline def vertex(x: Float, y: Float) = glVertex2f(x, y)

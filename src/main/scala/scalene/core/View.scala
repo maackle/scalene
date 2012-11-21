@@ -44,65 +44,76 @@ trait View extends Render with InternalTransform {
   }
 }
 
-trait ViewScheme extends Render
+// TODO: test all of these
+object View2D {
 
-object ViewScheme {
-  def simple(bg:Color, things:Seq[Thing with Render]) = new ViewSingle2D {
-    val view = new View2D {
-      val layers = Vector(
-        new Layer2D(0)(new SolidBackground(bg) :: Nil),
-        new Layer2D(1)(things)
+//  def simple(clearColor:Color)(things:Render*):View2D = simple(clearColor, things)
+  def simple(clearColor:Color, thing:Render):View2D = simple(clearColor, Seq(thing))
+  def simple(clearColor:Color, things:Seq[Render]):View2D = {
+    new View2D {
+      val layers = (
+        Layer2D(0, SolidBackground(clearColor)) ::
+        Layer2D(1, things) ::
+        Nil
       )
     }
   }
+
+  def apply(layers:Layer2D*) = {
+    val ls = layers
+    new View2D {
+      val layers = ls
+    }
+  }
+
+  def apply(clearColor:Color)(layers:Layer2D*) = {
+    val ls = layers
+    new View2D {
+      val layers = Layer2D.apply(0, SolidBackground(clearColor)) +: ls
+    }
+  }
+
 }
 
-object NoViewScheme extends ViewScheme {
-  val transform = Transform.static()
-  def render() {}
+object Layer2D {
+  def apply(parallax:Real, thing:Render):Layer2D = apply(parallax, Seq(thing))
+  def apply(parallax:Real, things:Seq[Render]) = {
+    new Layer2D(parallax)(things)
+  }
+
+//  def apply(parallax:Real)(things:Render*) = {
+//    new Layer2D(parallax)(things)
+//  }
+//  def apply(parallax:Real, thing:Render) = {
+//    new Layer2D(parallax)(Seq(thing))
+//  }
+
+}
+class Layer2D(val parallax:Real)(protected val things:Seq[Render]) extends Layer {
+  val __transform = Transform.static(scale = vec(parallax, parallax) )
+  def toSeq = things
 }
 
-trait ViewSingle2D extends ViewSingle {
-  val transform = Transform2D.identity
-  override def view:View2D
-}
-
-trait ViewSingle extends ViewScheme {
-  def view:View
-  def render() { view.__render() }
-}
-
-
-
-object View2D {
-}
 
 trait View2D extends View { view =>
   import View2D._
-  type Member = Thing with Render
 
   //  protected def zoom_=(v:R) { scale.x = v; scale.y = v }
   var zoom:Real = 1
   //  protected var scale:vec2 = vec2.one
-  protected var rotation:Radian = 0.0f
-  protected var scroll:vec2 = vec2.zero
+  var rotation:Radian = 0.0f
+  var scroll:vec2 = vec2.zero
   private var _scale = vec2.one
   def scale = {
     _scale.x = zoom
     _scale.y = zoom
     _scale
   }
-  val __transform = Transform.dynamic(()=>scroll, scale _, ()=>rotation)
+  val __transform = Transform.dynamic(()=> -scroll, scale _, ()=>rotation)
 
-  class Layer2D(val parallax:Real = 1)(protected val things:Seq[Member]) extends Layer {
-    import implicits._
-    val __transform = Transform.static(scale = vec(parallax, parallax) )
-    def toSeq = things
-  }
+  def layers:Seq[Layer2D]
 
-  def layers:IndexedSeq[Layer2D]
-
-  def thingsNearToFar:Seq[Member] = {
+  def thingsNearToFar:Seq[Render] = {
     val it = layers.map(_.toSeq).reverse.flatten
     it
   }
@@ -118,7 +129,7 @@ trait View2D extends View { view =>
 ///////////////////////////
 
 trait Layer extends Render with InternalTransform {
-  protected def things:Seq[Thing with Render]
+  protected def things:Seq[Render]
   def render() {
     things foreach (_.__render())
   }

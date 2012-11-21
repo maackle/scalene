@@ -1,4 +1,4 @@
-package run
+package scalene.tests
 
 import org.scalatest.FunSuite
 import collection.mutable.Stack
