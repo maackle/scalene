@@ -47,6 +47,10 @@ trait VBO /*with Render*/ {
 
   }
 
+  def update(verts:Array[vec2]) { //, texCoords:Array[vec2]=null, indices:Array[Int]=null) {
+
+  }
+
   def draw(method:Int) {
     glEnableClientState(GL_VERTEX_ARRAY)
     if(texCoords.isDefined) glEnableClientState(GL_TEXTURE_COORD_ARRAY)

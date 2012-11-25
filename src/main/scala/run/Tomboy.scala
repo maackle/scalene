@@ -75,12 +75,12 @@ object Tomboy extends Domain(run.Run) {
     val (w,h) = (32,32)
     var offset:vec2 = vec2.zero
     var position:vec2 = vec( if(side == Boy.Side.Left) -Boy.distance else Boy.distance, 0)
-    var velocity, accel = vec2.zero
+    var velocity, acceleration = vec2.zero
 
     var score = 0
 
     val gravity = vec(0, -666)
-    accel = gravity
+    acceleration = gravity
     val terminalSpeed = 999
     def render() {
       gl.fill(true)
@@ -88,7 +88,7 @@ object Tomboy extends Domain(run.Run) {
       draw.rect(offset + position - vec(w,h)/2, w, h)
     }
 
-    def simulate(dt:common.Real) {
+    override def simulate(dt:common.Real) {
       val arenaHeight = Arena.size._2
       velocity = velocity.limit(terminalSpeed)
       if(position.y-h/2 < -arenaHeight/2) {
@@ -103,8 +103,8 @@ object Tomboy extends Domain(run.Run) {
     }
 
     val handler = EventHandler {
-      case KeyDownEvent(`keyUp`) => accel = gravity + vec(0,999)
-      case KeyUpEvent(`keyUp`) => accel = gravity
+      case KeyDownEvent(`keyUp`) => acceleration = gravity + vec(0,999)
+      case KeyUpEvent(`keyUp`) => acceleration = gravity
 
 //      case KeyDownEvent(keyFire) => Op { println("PEW") }
     }
@@ -136,8 +136,8 @@ object Tomboy extends Domain(run.Run) {
     this ++= boys
 
     val handler = (
-      zoomer(0.99)(KEY_MINUS, KEY_EQUALS)
-      ++ panner(4)(KEY_W, KEY_A, KEY_S, KEY_D)
+      zoomer(view, 0.99)(KEY_MINUS, KEY_EQUALS)
+      ++ panner(view, 4)(KEY_W, KEY_A, KEY_S, KEY_D)
     )
 
     val view = View2D.simple(Color(0xC7E2C3), drawables)

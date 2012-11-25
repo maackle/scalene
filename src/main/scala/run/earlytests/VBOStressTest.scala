@@ -1,4 +1,4 @@
-package run.domain
+package run.earlytests
 
 import run.Run
 import org.lwjgl.BufferUtils
@@ -23,7 +23,7 @@ object VBOStressTest extends Domain(Run) { domain =>
     val circleVerts = for(i <- Array.range(0, N)) yield vec.polar(1, i*math.Pi*2/N )
     val vbo = VBO.create(circleVerts)
   }
-  class Circle(var position:vec2) extends Thing with Update with Render with Affine2D {
+  class Circle(var position:vec2) extends Thing with Update with Render {
     var radius = 10.0
     val rotation = 0.0
     def scale = vec(radius, radius)

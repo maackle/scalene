@@ -32,6 +32,7 @@ trait ImageAnimation extends Animation {
 class SpriteAnimation(var position:vec2, f:(Resource[Image], FrameOptions)*) extends SpriteLike with ImageAnimation {
 
   var scale = vec2.one
+  var rotation = 0.0
 
   def this(position:vec2, images:Seq[Resource[Image]], durationMs:Int, offset:vec2=null) = this(position, {
     val opt = FrameOptions(durationMs, offset)

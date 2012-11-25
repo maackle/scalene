@@ -6,9 +6,10 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
 import scalene.vector._
 import org.lwjgl.util.glu.GLU
-import scalene.gfx.{Transform2D, Transform, Color}
+import scalene.gfx._
 import scalene.misc.SolidBackground
 import scalene.common._
+import scalene.misc.SolidBackground
 
 trait View extends Render with InternalTransform {
 
@@ -90,7 +91,9 @@ object Layer2D {
 
 }
 class Layer2D(val parallax:Real)(protected val things:Seq[Render]) extends Layer {
-  val __transform = Transform.static(scale = vec(parallax, parallax) )
+  val __transform = Transform {
+    gl.scale(vec(parallax, parallax))
+  }
   def toSeq = things
 }
 
@@ -109,7 +112,11 @@ trait View2D extends View { view =>
     _scale.y = zoom
     _scale
   }
-  val __transform = Transform.dynamic(()=> -scroll, scale _, ()=>rotation)
+  val __transform = Transform {
+    gl.translate(-scroll)
+    gl.scale(scale)
+    gl.rotateRad(rotation)
+  }
 
   def layers:Seq[Layer2D]
 

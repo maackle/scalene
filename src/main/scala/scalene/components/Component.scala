@@ -27,13 +27,6 @@ trait Scaling2D {
   def scale: vec2
 }
 
-trait Rigid2D extends InternalTransform with Position2D with Rotation {
-  val __transform = Transform.dynamic(()=>position, null, ()=>rotation)
-}
-
-trait Affine2D extends InternalTransform with Position2D with Rotation with Scaling2D {
-  val __transform = Transform.dynamic(()=>position, ()=>scale, ()=>rotation)
-}
 
 trait Velocity extends Component { def velocity: vec }
 trait Velocity2D extends Component with Position2D with Simulate {
@@ -46,9 +39,9 @@ trait Velocity2D extends Component with Position2D with Simulate {
 
 trait Acceleration extends Component { def acceleration: vec }
 trait Acceleration2D extends Component with Velocity2D {
-  def accel: vec2
+  def acceleration: vec2
   override def __simulate(dt:common.Real) {
-    velocity += accel * dt
+    velocity += acceleration * dt
     super.__simulate(dt)
   }
 }

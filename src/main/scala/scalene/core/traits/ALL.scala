@@ -50,13 +50,6 @@ trait Initialize {
   protected def initialize()
 }
 
-trait InternalTransform extends Render {
-  def __transform:Transform
-  override def __render() {
-    __transform.apply { super.__render() }
-  }
-}
-
 trait Render {
   def render()
   def __render() = render()

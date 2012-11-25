@@ -12,7 +12,7 @@ package object common {
   private var __onetimer = collection.mutable.Set[Op]()
 
   private def _milliseconds = ((Sys.getTime * 1000) / Sys.getTimerResolution)
-  private var _milliseconds0 = _milliseconds
+  private lazy val _milliseconds0 = _milliseconds
   def milliseconds: Double = {
     _milliseconds - _milliseconds0
   }

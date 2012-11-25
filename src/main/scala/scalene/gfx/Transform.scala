@@ -2,42 +2,13 @@ package scalene.gfx
 
 import scalene.common._
 import scalene.vector._
-import org.lwjgl.opengl.GL11
-import org.lwjgl.BufferUtils
-import scalene.common
-
+import scalene.core.traits.{Render}
 
 object Transform {
-
-  def dynamic(translate: ()=>vec2=null, scale: ()=>vec2=null, rotate: ()=>Radian=null) = {
-    new Transformer2D(translate, scale, rotate)
+  def apply(fn: =>Unit) = new Transform {
+    def inject = fn
   }
-  def static(translate: vec2=vec2.zero, scale: vec2=vec2.one, rotate: Radian=0) = {
-    new Transform2D(translate, scale, rotate)
-  }
-  @inline def immediately(translate: vec2=null, scale: vec2=null, rotate: Radian=0)(bloc: =>Unit) {
-    gl.matrix {
-      inject(translate, scale, rotate)
-      bloc
-    }
-  }
-
-  //TODO: get the order right -- also, something weird is happening where half a rotation = a full rotation ?!
-  @inline def inject(translate: vec2, scale: vec2, rotate: Radian) {
-
-    if(translate!=null) gl.translate(translate)
-    if(scale!=null)     gl.scale(scale)
-    if(rotate!=0)       gl.rotateRad(rotate)
-  }
-  @inline def inject(translate: ()=>vec2, scale: ()=>vec2, rotate: ()=>Radian) {
-
-    if(translate!=null) gl.translate(translate())
-    if(scale!=null)     gl.scale(scale())
-    if(rotate!=null)    gl.rotateRad(rotate())
-  }
-
 }
-
 trait Transform { self =>
   @inline def inject()
   @inline def apply(bloc: =>Unit) = {
@@ -54,41 +25,25 @@ trait Transform { self =>
   }
 }
 
-trait TransformRigid extends Transform {
-  def translate: vec
-  def rotate: Radian
+trait InternalTransform extends Render {
+  def __transform:Transform
+  override def __render() {
+    __transform.apply { super.__render() }
+  }
 }
 
-trait TransformAffine extends TransformRigid {
-  def scale: vec
-  def shear:vec = ???
-}
+trait AutoTransformer2D extends Render {
+  def translate: vec2
+  def scale: vec2
+  def rotation: Radian
 
-trait TransformerRigid extends Transform {
-  def translate: ()=>vec
-  def rotate: ()=>Radian
-}
-trait TransformerAffine extends TransformerRigid {
-  def scale: ()=>vec
-  def shear: ()=>vec = ???
-}
-
-object Transform2D {
-  lazy val identity = new Transform2D(vec2.zero, vec2.one, 0)
-}
-
-class Transform2D(var translate: vec2, var scale: vec2, var rotate: Radian) extends TransformAffine {
-
-  def inject() = Transform.inject(translate, scale, rotate)
-
-}
-
-object Transformer2D {
-  lazy val identity = new Transformer2D(()=>vec2.zero, ()=>vec2.one, ()=>0)
-}
-
-class Transformer2D(val translate: ()=>vec2, val scale: ()=>vec2, val rotate: ()=>Radian) extends TransformerAffine {
-
-  def inject() = Transform.inject(translate, scale, rotate)
+  override def __render() {
+    gl.matrix {
+      gl.translate(translate)
+      gl.scale(scale)
+//      gl.rotateRad(rotation)
+      super.__render()
+    }
+  }
 
 }

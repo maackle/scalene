@@ -1,6 +1,6 @@
 package run
 
-import domain.SnailDomain
+import earlytests.SnailDomain
 import scalene.core.{ScaleneAppDebug, ScaleneApp}
 import scalene.gfx.Color
 

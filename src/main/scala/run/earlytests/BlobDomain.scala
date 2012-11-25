@@ -1,4 +1,4 @@
-package run.domain
+package run.earlytests
 
 import run.Run
 import scalene.event.KeyEventSource
@@ -14,7 +14,9 @@ object BlobDomain extends Domain(Run) { domain =>
 
   class Blob(val position:vec2) extends Thing with Position2D with Update with Render with InternalTransform {
 
-    val __transform = Transform.dynamic(()=>position, null, null)
+    val __transform = Transform {
+      gl.translate(position)
+    }
     val color = Color.magenta * maackle.util.Random.uniform(0.5,1).toFloat
 
     def update() {
@@ -32,7 +34,6 @@ object BlobDomain extends Domain(Run) { domain =>
 
     val N = 2000
     val n = math.sqrt(N).toInt
-    val transform = Transformer2D.identity
 
     val blobs = for {
       i <- -n/2 to n/2

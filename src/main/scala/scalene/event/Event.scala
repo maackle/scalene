@@ -9,6 +9,7 @@ import scalene.core.traits.{Thing, Execute, Update}
 import collection.mutable
 import grizzled.slf4j.{Logger, Logging}
 import scalene.vector.vec2
+import scalene.components.{Position2D, Position}
 
 object Event {
   type Id = Int
@@ -88,11 +89,13 @@ class MouseEventSource extends EventSource[MouseEvent] {
 
 trait HandyHandlers extends EventSink {
 
-  def view:View2D
-
   import LWJGLKeyboard._
 
-  def zoomer(ratio:Real)(out:Int=KEY_MINUS, in:Int=KEY_EQUALS) = {
+  type DPadKeys = (Int, Int, Int, Int)
+  val ArrowKeys = (KEY_UP, KEY_LEFT, KEY_DOWN, KEY_RIGHT)
+  val WASDKeys = (KEY_W, KEY_A, KEY_S, KEY_D)
+
+  def zoomer(view:View2D, ratio:Real)(out:Int=KEY_MINUS, in:Int=KEY_EQUALS) = {
     val amt = if(ratio < 1) 1 / ratio else ratio
     EventHandler {
       case KeyHoldEvent(`out`)  => view.zoom /= amt
@@ -100,14 +103,14 @@ trait HandyHandlers extends EventSink {
     }
   }
 
-  def panner(pixels:Real)(up:Int=KEY_W, left:Int=KEY_A, down:Int=KEY_S, right:Int=KEY_D) = EventHandler {
+  def panner(view:View2D, pixels:Real)(up:Int=KEY_W, left:Int=KEY_A, down:Int=KEY_S, right:Int=KEY_D) = EventHandler {
     case KeyHoldEvent(`left`)   => view.scroll.x -= pixels
     case KeyHoldEvent(`right`)  => view.scroll.x += pixels
     case KeyHoldEvent(`down`)   => view.scroll.y -= pixels
     case KeyHoldEvent(`up`)     => view.scroll.y += pixels
   }
 
-  def spinner(degrees:Real)(ccw:Int, cw:Int) = {
+  def spinner(view:View2D, degrees:Real)(ccw:Int, cw:Int) = {
     val rads = deg2rad(degrees)
     EventHandler {
       case KeyHoldEvent(`cw`)   => {
@@ -117,6 +120,19 @@ trait HandyHandlers extends EventSink {
         view.rotation += rads
       }
     }
+  }
+
+  def mover(v:vec2, amount:Real)(up:Int, left:Int, down:Int, right:Int) = EventHandler {
+    case KeyDownEvent(`left`)   => v.x -= amount
+    case KeyDownEvent(`right`)  => v.x += amount
+    case KeyDownEvent(`down`)   => v.y -= amount
+    case KeyDownEvent(`up`)     => v.y += amount
+    case KeyUpEvent(`left`) |
+         KeyUpEvent(`right`) =>
+      v.x = 0
+    case KeyUpEvent(`down`) |
+         KeyUpEvent(`up`) =>
+      v.y = 0
   }
 }
 
@@ -152,14 +168,9 @@ trait EventSinkSpecific[E <: Event] extends Thing {
 
 }
 
-trait EventSink extends EventSinkSpecific[Event] {
+trait EventSink extends EventSinkSpecific[Event] with LWJGLKeyboard {
 
   implicit def fn2handler(fn:EventHandler.Partial) = EventHandler(fn)
-
-}
-
-trait KeyEventSink extends EventSinkSpecific[KeyEvent] with LWJGLKeyboard {
-  //  def consume(source:EventSource) = source.presentTo(this)
 }
 
 

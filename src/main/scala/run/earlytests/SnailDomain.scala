@@ -1,4 +1,4 @@
-package run.domain
+package run.earlytests
 
 import scalene._
 import components.Position2D
@@ -21,7 +21,8 @@ import scala.PartialFunction
 trait Spirally
 extends EventSink
 with Position2D
-with Update {
+with Update
+with AutoTransformer2D {
 
   protected var velocity = vec2.zero
 
@@ -38,7 +39,7 @@ object Snail {
   val im = Resource("img/snail.png")(Image.load)
 }
 class Snail(pos:vec2) extends Sprite(Snail.im, pos, vec2.one*2) with Spirally {
-
+  def translate = position
   def update() {
     position += velocity
   }

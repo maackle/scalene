@@ -24,6 +24,11 @@ class vec2(var x:V, var y:V) extends vec2base {
     y *= c
   }
   @inline
+  def *=(c:Double) = {
+    x *= c
+    y *= c
+  }
+  @inline
   def set(v:vec2) {
     x = v.x
     y = v.y

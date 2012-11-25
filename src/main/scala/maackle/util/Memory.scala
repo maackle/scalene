@@ -46,6 +46,11 @@ class MemoryNumeric[T: Numeric](size: Int, default: T) extends Memory[T](size, d
   def min = history.reduce(_ min _)
 
   def max = history.reduce(_ max _)
+
+  def diffLast = {
+    assert(history.size > 1)
+    now - prev
+  }
 }
 
 case class MemInt(override val size: Int) extends MemoryNumeric(size, 0) {
