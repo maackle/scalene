@@ -1,7 +1,7 @@
 package scalene.core
 
 import scalene.common._
-import scalene.gfx.{Color, gl, GLSettings}
+import scalene.gfx.{TTF, Color, gl, GLSettings}
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl._
 import grizzled.slf4j.Logging
@@ -11,8 +11,29 @@ import scalene.helpers.MemDouble
 import traits.Initialize
 import scalene.core.State.StateMachine
 import scalene.common
+import scalene.vector.vec
+import scalene.audio.SoundStore
 
 //trait ScaleneInnerClasses { app:ScaleneApp => }
+
+trait ScaleneAppDebug extends ScaleneApp {
+
+  lazy val font = Resource("font/UbuntuMono-R.ttf")(TTF(_, 20)).is
+
+  def avgFPS:Double
+  def debugColor:Color
+
+  override def loopBody() {
+    super.loopBody()
+    GLSettings.viewHUD()
+    font.drawString(
+      "fps: %d (%4.1f ms)".format(avgFPS.round.toInt, avgExecutionTime),
+      vec(5, currentWindowSize._2 - 5),
+      debugColor,
+      vec(-1,-1)
+    )
+  }
+}
 
 abstract class ScaleneApp
 extends App /*with ScaleneInnerClasses*/
@@ -45,11 +66,7 @@ with Logging {
   )
   def eventSources = _eventSources.toSeq
 
-  //TODO: let's not use this for the basics.  only for user-created Sources (none exist yet (10-8))
-//  private def registerEventSource(es:EventSource) {
-//    _eventSources += es
-//  }
-
+  def avgExecutionTime = _loopTime.avg
   def avgFPS = {
     1000 / _loopTime.avg
   }
@@ -60,18 +77,22 @@ with Logging {
   def millis:Int = (common.milliseconds - _startupTime).toInt
 
   delayedInit {
-
     info("starting up at %s" format msecsStartup)
+    run()
+  }
+
+  def run() {
     initialize()
     var _ms = milliseconds
     while(!org.lwjgl.input.Keyboard.isKeyDown(LWJGLKeyboard.KEY_ESCAPE)) {
+      GLSettings.orthographic()
       loopBody()
       _tick += 1
       val newms = milliseconds
       _loopTime << (milliseconds - _ms)
       _ms = newms
-//      TextureImpl.bindNone() // TODO: find a way to remove this!
-      if(_tick % 100 == 0) println("FPS: %s %s" format (avgFPS, lastFPS))
+      //      TextureImpl.bindNone() // TODO: this may be necessary if font rendering glitches out...
+      Display.update()
       Display.sync(fps)
     }
     cleanup()
@@ -92,6 +113,8 @@ with Logging {
     // as soon as the display is initialized we can load resources
     Resource.beginAutoloading()
 
+    SoundStore.init()
+
     GLSettings.defaults()
     GLSettings.orthographic()
 
@@ -111,7 +134,6 @@ with Logging {
       currentState.__render()
     }
 
-    Display.update()
   }
 
 }

@@ -33,8 +33,7 @@ trait SubTexture extends Textured {
     val vbo =
       VBO.create(
         vertices = vertices,
-        texCoords = texCoords,
-        indices = Array(0,1,2,3)
+        texCoords = texCoords
       )
     vbo.setup()
     vbo

@@ -1,14 +1,18 @@
 package run
 
-import run.domain._
-import scalene.core.ScaleneApp
+import domain.SnailDomain
+import scalene.core.{ScaleneAppDebug, ScaleneApp}
+import scalene.gfx.Color
 
 object Run extends {
 
   val windowSize = Some(600,600)
   val windowTitle = "SCALENE GAME"
 
-} with ScaleneApp {
+} with ScaleneApp with ScaleneAppDebug {
 
-  lazy val startState = new Tomboy.PlayTomboy
+  val debugColor = Color.black
+  lazy val startState = SnailDomain.SnailState
+//  lazy val startState = new Tomboy.PlayTomboy
+
 }

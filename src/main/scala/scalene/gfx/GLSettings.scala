@@ -22,4 +22,14 @@ object GLSettings {
     glLoadIdentity()
     glOrtho(-width/2, width/2, -height/2, height/2, -1, 1)
   }
+
+  def viewHUD() {
+    import org.lwjgl.opengl.Display
+    val width = Display.getDisplayMode.getWidth
+    val height = Display.getDisplayMode.getHeight
+
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(0, width, 0, height, -1, 1)
+  }
 }

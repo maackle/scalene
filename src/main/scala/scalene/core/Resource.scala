@@ -89,6 +89,7 @@ object Resource extends Logging {
     }
     def map = common.???
     def load() {
+
       x = fn(locator)
       isLoaded = true
     }

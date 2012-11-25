@@ -37,7 +37,7 @@ class TTF(path:String, size:Int, style:TTF.FontStyle.Plain.type) {
     val y = pos.y - (anchor.y/2 + .5f) * h
     val offset = vec(
       (anchor.x/2 + .5f) * -w,
-      (anchor.y/2 + .5f) * h
+      (anchor.y/2 + .5f) * -h
     )
 
     Tex.bindNone()

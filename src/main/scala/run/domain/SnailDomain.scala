@@ -57,7 +57,7 @@ object SnailDomain extends Domain(Run) with Logging { domain =>
   val bgColor = Color(0.5f, 0.5f, 0.5f)
 
   val snails = (
-    (List.range(1,1000) map { _:Int => new Snail(vec.polar.random(300)) } ) :::
+    (List.range(1,5000) map { _:Int => new Snail(vec.polar.random(300)) } ) :::
     Nil
   )
 

@@ -13,24 +13,27 @@ import scalene.event.KeyDownEvent
 import run.Tomboy.{Boy, Arena}
 import run.Tomboy.Boy.Side
 import scalene.core.traits.{Thing, Simulate, Render}
-
+import scalene.audio.SoundStore
 
 object Tomboy extends Domain(run.Run) {
 
-  val game = app
+  lazy val game = app
+
+  val sounds = new SoundStore()
+  sounds.addSource("snd/oddbounce.ogg")
 
   object Arena {
     def size = game.currentWindowSize
   }
 
   class Arena(boys:(Boy,Boy)) extends Thing with Render {
-    val size = Arena.size
+    lazy val size = Arena.size
     var scoreL, scoreR = 0
 
     lazy val font = TTF("src/main/resources/font/redhead.ttf", 80)
 
     lazy val (boyLeft, boyRight) = boys
-    val (w,h) = size
+    lazy val (w,h) = size
 
     val scoreDist = 40
 
@@ -43,8 +46,8 @@ object Tomboy extends Domain(run.Run) {
 
     def render() {
       color.bind()
-      font.drawString(boyLeft.score.toString, vec(-scoreDist, h * 0.9 / 2), Line.color)
-      font.drawString(boyRight.score.toString, vec(scoreDist, h * 0.9 / 2), Line.color)
+      font.drawString(boyLeft.score.toString, vec(-scoreDist, h * 0.5), Line.color)
+      font.drawString(boyRight.score.toString, vec(scoreDist, h * 0.5), Line.color)
       draw.rect(vec(-thickness/2, -h), thickness, 2*h)
     }
   }
@@ -91,6 +94,7 @@ object Tomboy extends Domain(run.Run) {
       if(position.y-h/2 < -arenaHeight/2) {
         velocity.y = math.abs(velocity.y)
         score += 1
+        sounds("oddbounce").play(true)
       }
       if(position.y+h/2 > arenaHeight/2) {
         velocity.y = -math.abs(velocity.y)

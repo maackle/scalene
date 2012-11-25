@@ -9,10 +9,12 @@ import traits.Update
  * Time: 10:48 AM
  * To change this template use File | Settings | File Templates.
  */
-abstract class Domain(theApp:ScaleneApp) extends ThingStore with Update {
+abstract class Domain(val app:ScaleneApp) extends ThingStore with Update {
 
-  val app = theApp
   def currentState:State = app.currentState
+
+  //TODO: a way to define an initialize() method that is called once onEnter for a State in this Domain
+  //TODO: a way to easily associate States with their Domains, i.e. optional containers
 
 }
 
