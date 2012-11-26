@@ -1,6 +1,5 @@
 package scalene.gfx.particles
 
-import scalene.gfx.{SpriteBatch, SpriteBatchGhetto}
 import scalene.common._
 import scalene.components.{Position2D, Acceleration2D}
 import scalene.core.traits.{Update, Render}

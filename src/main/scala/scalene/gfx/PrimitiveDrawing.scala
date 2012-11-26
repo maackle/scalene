@@ -10,7 +10,6 @@ trait PrimitiveDrawing extends gl {
   type R = common.Real
   type Vertex = (V,V)
   type VertexList = Array[Vertex]
-  type VecList = Array[Vec2]
 
   protected var circlepts:Map[ Int, VertexList ] = Map()
 
@@ -18,17 +17,13 @@ trait PrimitiveDrawing extends gl {
   def bindVertices(verts:Seq[vec2]) {
     for(v <- verts) vertex(v)
   }
+
   @inline
   def bindVertices(verts:VertexList) {
-    for(v <- verts) { vertex(v._1, v._2)
-
+    for(v <- verts) {
+      vertex(v._1, v._2)
     }
   }
-//  @inline
-//  def bindVertices(verts:VecList) {
-//    for(v <- verts) vertex(v)
-//  }
-
   @inline
   protected def getCircle(num:Int):VertexList = {
     if (!circlepts.isDefinedAt(num)) {
@@ -66,12 +61,14 @@ trait PrimitiveDrawing extends gl {
     for (v <- points) vertex(v._1, v._2)
     glEnd()
   }
+
   def line(pair:(vec2, vec2)) {
     glBegin(GL_LINES)
     vertex(pair._1)
     vertex(pair._2)
     glEnd()
   }
+
   def line(v1:vec2, v2:vec2) {
     glBegin(GL_LINES)
     vertex(v1)
@@ -82,11 +79,13 @@ trait PrimitiveDrawing extends gl {
   def vector(origin:vec2, to:vec2) {
     line(origin, origin+to)
   }
+
   def vector(pair:(vec2,vec2)) {
     line((pair._1, pair._1 + pair._2))
   }
-  def rect(pos:vec2, w:common.Real, h:common.Real) {
-    gl.fill(true)
+
+  def rect(w:common.Real, h:common.Real) {
+    val pos = -vec(w/2, h/2)
     gl.begin(GL_POLYGON) {
       gl.vertex(pos)
       gl.vertex(pos + vec(0, h))
@@ -94,6 +93,28 @@ trait PrimitiveDrawing extends gl {
       gl.vertex(pos + vec(w, 0))
     }
   }
+
+  def rect(center:vec2, w:common.Real, h:common.Real) {
+    val pos = center - vec(w/2, h/2)
+    gl.begin(GL_POLYGON) {
+      gl.vertex(pos)
+      gl.vertex(pos + vec(0, h))
+      gl.vertex(pos + vec(w, h))
+      gl.vertex(pos + vec(w, 0))
+    }
+  }
+
+  def rect(from:vec2, to:vec2) {
+
+    gl.begin(GL_POLYGON) {
+      for(v <- List(
+        (from.x, from.y),
+        (from.x, to.y),
+        (to.x, to.y),
+        (to.x, from.y)
+      )) gl.vertex(v)
+    }
+  }
 }
 
-object draw extends  PrimitiveDrawing
+object draw extends PrimitiveDrawing

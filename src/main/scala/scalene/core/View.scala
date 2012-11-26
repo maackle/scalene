@@ -1,13 +1,13 @@
 package scalene.core
 
-import traits.{Thing, InternalTransform, Render}
+import scalene.gfx._
+
+import traits.Render
 import java.nio.{FloatBuffer, IntBuffer}
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
 import scalene.vector._
 import org.lwjgl.util.glu.GLU
-import scalene.gfx._
-import scalene.misc.SolidBackground
 import scalene.common._
 import scalene.misc.SolidBackground
 
@@ -99,7 +99,6 @@ class Layer2D(val parallax:Real)(protected val things:Seq[Render]) extends Layer
 
 
 trait View2D extends View { view =>
-  import View2D._
 
   //  protected def zoom_=(v:R) { scale.x = v; scale.y = v }
   var zoom:Real = 1

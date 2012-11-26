@@ -1,7 +1,6 @@
 package scalene.core
 
 import traits.Render
-import actors.Actor
 import scalene.event.EventSink
 import scalene.input.LWJGLKeyboard
 
@@ -17,22 +16,41 @@ abstract class ScaleneSketch
   with EventSink
   with LWJGLKeyboard
 
-trait StateMixin extends ScaleneApp with ThingStore with Render { self =>
+trait StateEventHandling extends ThingStore {
+
+  abstract override def __update() {
+    super.__update()
+    val sinks:Set[EventSink] = (everything + this) flatMap {
+      case s:EventSink => Some(s)
+      case _ => None
+    }
+
+    for {
+      source <- app.eventSources
+      sink <- sinks
+    } {
+      source.presentTo(sink)
+    }
+  }
+}
+
+trait StateMixin extends ScaleneApp with ThingStore with StateEventHandling with Render { self =>
 
   def app = this
   val view:View2D
 
   lazy val startState = new State(this) {
     val view = self.view
-    override def updateables = self.updateables
+    override def everything = self.everything
   }
 
   def render() {
     if(view!=null) view.__render()
   }
+
 }
 
-abstract class State(val app:ScaleneApp) extends ThingStore with Render {
+abstract class State(val app:ScaleneApp) extends ThingStore with StateEventHandling with Render {
   def this(domain:Domain) = this(domain.app)
   val view:View2D
 
@@ -46,10 +64,6 @@ abstract class State(val app:ScaleneApp) extends ThingStore with Render {
 
 
 object State {
-
-  object CrashAndBurn extends State(null.asInstanceOf[ScaleneApp]) {
-    val view = null
-  }
 
   class StateMachine(startState:State) {
     assert(startState != null)

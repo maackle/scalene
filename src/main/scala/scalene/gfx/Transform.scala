@@ -1,8 +1,8 @@
 package scalene.gfx
 
-import scalene.common._
 import scalene.vector._
-import scalene.core.traits.{Render}
+import scalene.core.traits.Render
+import scalene.components.Position2D
 
 object Transform {
   def apply(fn: =>Unit) = new Transform {
@@ -26,24 +26,22 @@ trait Transform { self =>
 }
 
 trait InternalTransform extends Render {
-  def __transform:Transform
-  override def __render() {
+  protected def __transform:Transform
+  abstract override def __render() {
     __transform.apply { super.__render() }
   }
 }
 
-trait AutoTransformer2D extends Render {
-  def translate: vec2
+trait AutoTransformer2D extends InternalTransform with Position2D {
+  def translate: vec2 = position
   def scale: vec2
   def rotation: Radian
 
-  override def __render() {
-    gl.matrix {
-      gl.translate(translate)
-      gl.scale(scale)
-//      gl.rotateRad(rotation)
-      super.__render()
-    }
+  protected var __transform = Transform {
+    gl.translate(translate)
+    gl.scale(scale)
+    gl.rotateRad(rotation)
   }
+
 
 }

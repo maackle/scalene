@@ -1,16 +1,14 @@
-package run.earlytests
+package demos
 
-import run.Run
-import scalene.core.traits.{Thing, Update}
-import scalene.components._
+import scalene.core.traits.{Component, Update}
 import scalene.core.{View2D, State, Op, VBO}
 import scalene.vector.{vec2, vec}
 import org.lwjgl.opengl.GL11
-import scalene.gfx.{AutoTransformer2D, gl, Color}
+import scalene.gfx.{AutoTransformer2D, Color}
 import scalene.event._
 import scalene.event.KeyHoldEvent
 
-class LogoTest extends State(Run) with EventSink {
+class LogoTest extends /*State() with*/ EventSink {
 
   val logos = for(i <- Array.range(0,1)) yield new Logo(vec(0,0))
   val view = View2D.simple(Color.gray, logos)
@@ -52,10 +50,10 @@ class LogoTest extends State(Run) with EventSink {
     }
     val vbo = VBO.create(verts, indices=indices)
   }
-  class Logo(var position:vec2) extends Thing with Update with AutoTransformer2D {
+  class Logo(var position:vec2) extends Update with AutoTransformer2D {
     var rotation = 0.0
     var scale = vec(10,10)
-    def translate = position
+//    def translate = position
 
     def update() {}
 

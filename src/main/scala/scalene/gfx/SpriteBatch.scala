@@ -1,9 +1,8 @@
 package scalene.gfx
 
 import scalene.core.Resource
-import scalene.vector.vec2
 import scalene.core.traits.Render
-import scalene.components.{Position2D, Position}
+import scalene.components.Position2D
 import collection.mutable
 
 trait SpriteBatch extends Render {

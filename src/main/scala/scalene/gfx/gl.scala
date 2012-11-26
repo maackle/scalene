@@ -1,10 +1,6 @@
 package scalene.gfx
 
-import org.newdawn.slick
 import org.lwjgl.opengl.GL11._
-import org.jbox2d.common.Color3f
-import scala.collection.mutable
-import math._
 import scalene.vector.vec2
 
 object gl extends gl

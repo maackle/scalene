@@ -1,21 +1,17 @@
-package run
+package demos.tomboy.states
 
 import scalene.gfx._
 import scalene.components.Acceleration2D
 import scalene.common
 import scalene.vector.{vec, vec2}
-import org.lwjgl.opengl.GL11
 import scalene.event._
 import scalene.input.LWJGLKeyboard
-import scalene.core.{View2D, Domain, State, Op}
-import scalene.event.KeyHoldEvent
+import scalene.core.{View2D, Domain, State}
 import scalene.event.KeyDownEvent
-import run.Tomboy.{Boy, Arena}
-import run.Tomboy.Boy.Side
-import scalene.core.traits.{Thing, Simulate, Render}
+import scalene.core.traits.{Component, Simulate, Render}
 import scalene.audio.SoundStore
 
-object Tomboy extends Domain(run.Run) {
+object Tomboy extends Domain(null) {
 
   lazy val game = app
 
@@ -26,7 +22,7 @@ object Tomboy extends Domain(run.Run) {
     def size = game.currentWindowSize
   }
 
-  class Arena(boys:(Boy,Boy)) extends Thing with Render {
+  class Arena(boys:(Boy,Boy)) extends Render {
     lazy val size = Arena.size
     var scoreL, scoreR = 0
 
@@ -48,7 +44,7 @@ object Tomboy extends Domain(run.Run) {
       color.bind()
       font.drawString(boyLeft.score.toString, vec(-scoreDist, h * 0.5), Line.color)
       font.drawString(boyRight.score.toString, vec(scoreDist, h * 0.5), Line.color)
-      draw.rect(vec(-thickness/2, -h), thickness, 2*h)
+      draw.rect(thickness, 2*h)
     }
   }
 
@@ -65,8 +61,8 @@ object Tomboy extends Domain(run.Run) {
     val distance = 200
   }
 
-  case class Boy(side:Boy.Side.Value, color:Color)(keyUp:Int, keyFire:Int) extends Thing
-  with Render
+  case class Boy(side:Boy.Side.Value, color:Color)(keyUp:Int, keyFire:Int)
+  extends Render
   with Lasery
   with EventSink
   with LWJGLKeyboard
@@ -85,7 +81,7 @@ object Tomboy extends Domain(run.Run) {
     def render() {
       gl.fill(true)
       color.bind()
-      draw.rect(offset + position - vec(w,h)/2, w, h)
+      draw.rect(offset + position, w, h)
     }
 
     override def simulate(dt:common.Real) {
@@ -111,7 +107,7 @@ object Tomboy extends Domain(run.Run) {
 
   }
 
-  class PlayTomboy extends State(run.Run) with HandyHandlers {
+  class PlayTomboy extends State(Tomboy) with HandyHandlers {
 
     def simulate(dt:common.Real) = {
       boys.foreach{ b =>
@@ -119,7 +115,6 @@ object Tomboy extends Domain(run.Run) {
       }
     }
 
-    import LWJGLKeyboard._
     import Boy._
 
     val arenaSize = app.currentWindowSize

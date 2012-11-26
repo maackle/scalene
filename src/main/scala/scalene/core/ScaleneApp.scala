@@ -4,7 +4,7 @@ import scalene.common._
 import scalene.gfx.{TTF, Color, gl, GLSettings}
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl._
-import grizzled.slf4j.Logging
+import grizzled.slf4j.{Logger, Logging}
 import scalene.input.LWJGLKeyboard
 import scalene.event.{Event, KeyEventSource, EventSource}
 import scalene.helpers.MemDouble
@@ -37,8 +37,7 @@ trait ScaleneAppDebug extends ScaleneApp {
 
 abstract class ScaleneApp
 extends App /*with ScaleneInnerClasses*/
-with Initialize
-with Logging {
+with Initialize {
 
   val windowSize:Option[(Int,Int)]
   val windowTitle:String
@@ -51,7 +50,7 @@ with Logging {
 
   protected lazy val stateMachine = new StateMachine(startState)
   private var _tick = 0
-  private var _loopTime = MemDouble(32)
+  private var _loopTime, _executionTime = MemDouble(32)
   private var _startupTime = 0.0
 
   private def _winsize = windowSize.get
@@ -66,7 +65,7 @@ with Logging {
   )
   def eventSources = _eventSources.toSeq
 
-  def avgExecutionTime = _loopTime.avg
+  def avgExecutionTime = _executionTime.avg
   def avgFPS = {
     1000 / _loopTime.avg
   }
@@ -77,7 +76,7 @@ with Logging {
   def millis:Int = (common.milliseconds - _startupTime).toInt
 
   delayedInit {
-    info("starting up at %s" format msecsStartup)
+    Logger("ScaleneApp").info("starting up at %s" format msecsStartup)
     run()
   }
 
@@ -85,12 +84,13 @@ with Logging {
     initialize()
     var _ms = milliseconds
     while(!org.lwjgl.input.Keyboard.isKeyDown(LWJGLKeyboard.KEY_ESCAPE)) {
+      val loopStartTime = milliseconds
       GLSettings.orthographic()
       loopBody()
       _tick += 1
-      val newms = milliseconds
       _loopTime << (milliseconds - _ms)
-      _ms = newms
+      _executionTime << (milliseconds - loopStartTime)
+      _ms = loopStartTime
       //      TextureImpl.bindNone() // TODO: this may be necessary if font rendering glitches out...
       Display.update()
       Display.sync(fps)
@@ -107,8 +107,8 @@ with Logging {
     val ctxAttr = new ContextAttribs(3, 0)//.withForwardCompatible(true);
 //    contextAtrributes.withProfileCore(true);
     Display.create(pxfmt, ctxAttr)
-    info("Display created")
-    info("bpp: " + Display.getDisplayMode.getBitsPerPixel)
+    Logger("ScaleneApp").info("Display created")
+    Logger("ScaleneApp").info("bpp: " + Display.getDisplayMode.getBitsPerPixel)
 
     // as soon as the display is initialized we can load resources
     Resource.beginAutoloading()
@@ -125,8 +125,8 @@ with Logging {
   }
 
   def loopBody() {
-    currentState.update()
-    _eventSources.foreach(_.update())
+    currentState.__update()
+    _eventSources.foreach(_.__update())
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()

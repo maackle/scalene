@@ -4,8 +4,6 @@ import org.lwjgl.input.{Keyboard => Kbd}
 
 /* taken straight from Scage */
 
-trait Keys extends Kbd
-
 trait LWJGLKeyboard {
 
   type KeyEventId = Int
@@ -140,5 +138,5 @@ trait LWJGLKeyboard {
   lazy val KEY_SLEEP = Kbd.KEY_SLEEP
 }
 
-
 object LWJGLKeyboard extends LWJGLKeyboard
+object Keys extends LWJGLKeyboard

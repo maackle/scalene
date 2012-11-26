@@ -1,8 +1,7 @@
 package scalene.core
 
-import traits.{Thing, Render}
+import traits.{Component, Render}
 import scalene.gfx.gl
-import grizzled.slf4j.Logger
 
 object Op {
   def apply(fn: =>Any) = new Op(()=>{fn})
@@ -13,7 +12,7 @@ class Op(val fn:()=>Any) {
 }
 
 
-class DrawOp(renderBlock: ()=>Unit) extends Op(renderBlock) with Thing with Render {
+class DrawOp(renderBlock: ()=>Unit) extends Op(renderBlock) with Render {
   def render() {
     gl.matrix {
       renderBlock()

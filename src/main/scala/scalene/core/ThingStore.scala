@@ -1,16 +1,10 @@
 package scalene.core
 
 import scalene.event.EventSink
-import traits.{Simulate, Update, Thing}
+import traits.{Render, Simulate, Update, Component}
 
-/**
- * Created with IntelliJ IDEA.
- * User: michael
- * Date: 11/13/12
- * Time: 10:46 AM
- * To change this template use File | Settings | File Templates.
- */
-trait ThingStore extends Thing {
+
+trait ThingStore extends Update {
 
   def app:ScaleneApp
 
@@ -20,12 +14,13 @@ trait ThingStore extends Thing {
 //    }
 //  }
 
-  def update() {
-    val us = updateables
-    val sinks:Set[EventSink] = (updateables + this) flatMap {
-      case s:EventSink => Some(s)
-      case _ => None
-    }
+  def update() {}
+
+  abstract override def __update() {
+
+    super.__update()
+
+    val us = everything
 
     us foreach {
       case t : Update => t.__update()
@@ -37,19 +32,17 @@ trait ThingStore extends Thing {
       case _ =>
     }
 
-    for {
-      source <- app.eventSources
-      sink <- sinks
-    } {
-      source.presentTo(sink)
-    }
   }
 
-  protected def += (t:Thing) { assert(t!=this); __things += t }
-  protected def -= (t:Thing) { assert(t!=this); __things -= t }
-  protected def ++= (t:Seq[Thing]) { assert(t!=this); __things ++= t }
-  protected def --= (t:Seq[Thing]) { assert(t!=this); __things --= t }
+  protected def += (t:Component) { assert(t!=this); __things += t }
+  protected def -= (t:Component) { assert(t!=this); __things -= t }
+  protected def ++= (t:Seq[Component]) { assert(t!=this); __things ++= t }
+  protected def --= (t:Seq[Component]) { assert(t!=this); __things --= t }
 
-  private var __things = collection.mutable.Set[Thing]()
-  def updateables:Set[Thing] = __things.toSet
+  private var __things = collection.mutable.Set[Component]()
+  def everything:Set[Component] = __things.toSet
+  def renderables = __things flatMap {
+    case t:Render => Some(t)
+    case _ => None
+  }
 }

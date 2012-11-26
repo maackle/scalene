@@ -1,10 +1,7 @@
 package scalene.core
 
-import java.io.{File, InputStream}
-import maackle.util._
 import scalene.common
 import grizzled.slf4j.{Logging, Logger}
-import org.newdawn.slick.opengl.Texture
 import scala.None
 
 trait Resource[O] {

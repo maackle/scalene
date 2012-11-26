@@ -1,16 +1,12 @@
 package scalene.core
 
-import org.lwjgl.opengl.{GL13, GLContext, GL15, GL11}
-import scalene.gfx.gl
+import org.lwjgl.opengl.{GL13, GL15}
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.BufferUtils
-import scalene.vector.vec
 import scalene.vector.vec2
 import java.nio.{FloatBuffer, IntBuffer, DoubleBuffer, Buffer}
-import traits.{Render, Thing}
 import scala.Some
-import grizzled.slf4j.Logger
 
 abstract class VboBuffer[B <: Buffer](val buffer:B, val length:Int) {
   val id = GL15.glGenBuffers()

@@ -1,6 +1,6 @@
 package scalene.vector
 
-import scala.math._
+
 //
 //trait vec3base {
 //

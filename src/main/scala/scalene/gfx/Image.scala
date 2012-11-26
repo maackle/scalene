@@ -3,7 +3,6 @@ package scalene.gfx
 import java.io.{FileInputStream, File}
 import org.newdawn.slick.opengl.TextureLoader
 import maackle.util._
-import scalene.vector.{vec, vec2}
 import scalene.core.Resource
 
 //class TooNiceImage(val tex:Tex, cliprect:ClipRect = null, centerPos:vec2 = null) extends SubTexture {

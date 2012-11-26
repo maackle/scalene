@@ -1,9 +1,8 @@
 package scalene.gfx
 
-import org.newdawn.slick.opengl.{TextureImpl, Texture, TextureLoader}
-import maackle.util._
+import org.newdawn.slick.opengl.{TextureImpl, Texture}
 import org.lwjgl.opengl.GL11._
-import org.lwjgl.opengl.{GL13, GL15}
+import org.lwjgl.opengl.GL13
 
 //class Tex(val id:Int, image:BufferedImage) {
 //  val (getImageWidth, getImageHeight) = (image.getWidth, image.getHeight)

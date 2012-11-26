@@ -25,6 +25,8 @@ abstract class vec2base extends vec {
   @inline
   def manhattan = math.abs(x) + math.abs(y)
 
+  def nonZero = x != 0 || y != 0
+
   def rotate(rad:Radian):vec2 = {
     val ca = cos(rad)
     val sa = sin(rad)

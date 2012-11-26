@@ -1,8 +1,8 @@
 package scalene
 
-import net.java.games.input.{Controller, ControllerEnvironment, Component}
+import net.java.games.input.{Component, Controller, ControllerEnvironment}
 import Component.Identifier
-import Component.Identifier.{Axis, Button}
+import Component.Identifier.Button
 import maackle.util._
 import collection.mutable.ListBuffer
 import scalene.vector.{vec2, vec}

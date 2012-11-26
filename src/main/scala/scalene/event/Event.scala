@@ -1,15 +1,14 @@
 package scalene.event
 
 import scalene.common._
-import scalene.input.{LWJGLKeyboard}
-import scalene.core.{View2D, State, Op}
+import scalene.input.LWJGLKeyboard
+import scalene.core.{View2D, Op}
 import scalene.helpers.MemBoolean
 import org.lwjgl.input.{Keyboard=>Kbd}
-import scalene.core.traits.{Thing, Execute, Update}
+import scalene.core.traits.{Component, Update}
 import collection.mutable
-import grizzled.slf4j.{Logger, Logging}
+import grizzled.slf4j.Logging
 import scalene.vector.vec2
-import scalene.components.{Position2D, Position}
 
 object Event {
   type Id = Int
@@ -34,7 +33,7 @@ case class MouseDownEvent(code:Int, position:vec2) extends MouseEvent
 case class MouseUpEvent(code:Int, position:vec2) extends MouseEvent
 case class MouseHoldEvent(code:Int, position:vec2) extends MouseEvent
 
-trait EventSource[+Unused <: Event] extends Thing with Update with Logging { self =>
+trait EventSource[+Unused <: Event] extends Update with Logging { self =>
   protected def raise(ev:Event) {
     debug("raised: %s" format ev)
     eventQueue += ev
@@ -89,7 +88,6 @@ class MouseEventSource extends EventSource[MouseEvent] {
 
 trait HandyHandlers extends EventSink {
 
-  import LWJGLKeyboard._
 
   type DPadKeys = (Int, Int, Int, Int)
   val ArrowKeys = (KEY_UP, KEY_LEFT, KEY_DOWN, KEY_RIGHT)
@@ -140,20 +138,74 @@ object EventHandler {
   type Partial = PartialFunction[Event, Any]
   type Lifted = Function[Event, Option[Any]]
 
-  def apply(fn:Partial) = new EventHandler(fn.lift)
+  def bindKey(key:Int)(down: =>Unit, up: =>Unit) = EventHandler {
+    case KeyDownEvent(`key`) => down
+    case KeyUpEvent(`key`) => up
+  }
+
+  def bindvec(v:vec2, amount:Real, allowDiagonals:Boolean=true)(up:Int, left:Int, down:Int, right:Int) =
+    EventHandler {
+        case KeyHoldEvent(`left`) =>
+          v.x = -amount
+          if(!allowDiagonals) v.y = 0
+        case KeyHoldEvent(`right`) =>
+          v.x = +amount
+          if(!allowDiagonals) v.y = 0
+        case KeyHoldEvent(`down`) =>
+          v.y = -amount
+          if(!allowDiagonals) v.x = 0
+        case KeyHoldEvent(`up`) =>
+          v.y = +amount
+          if(!allowDiagonals) v.x = 0
+        case KeyUpEvent(`left`) |
+             KeyUpEvent(`right`) =>
+          v.x = 0
+          if(!allowDiagonals) v.y = 0
+        case KeyUpEvent(`down`) |
+             KeyUpEvent(`up`) =>
+          v.y = 0
+          if(!allowDiagonals) v.x = 0
+    }
+//  def bindvec(v:vec2, amount:Real, allowDiagonals:Boolean=true)(up:Int, left:Int, down:Int, right:Int) =
+//    EventHandler {
+//        case KeyDownEvent(`left`) =>
+//          v.x = -amount
+//          if(!allowDiagonals) v.y = 0
+//        case KeyDownEvent(`right`) =>
+//          v.x = +amount
+//          if(!allowDiagonals) v.y = 0
+//        case KeyDownEvent(`down`) =>
+//          v.y = -amount
+//          if(!allowDiagonals) v.x = 0
+//        case KeyDownEvent(`up`) =>
+//          v.y = +amount
+//          if(!allowDiagonals) v.x = 0
+//        case KeyUpEvent(`left`) |
+//             KeyUpEvent(`right`) =>
+//          v.x = 0
+//          if(!allowDiagonals) v.y = 0
+//        case KeyUpEvent(`down`) |
+//             KeyUpEvent(`up`) =>
+//          v.y = 0
+//          if(!allowDiagonals) v.x = 0
+//    }
+
+  def apply(fn:Partial) = new EventHandler(fn)
 }
 
-class EventHandler(val fn:EventHandler.Lifted) {
+class EventHandler(val lifted:EventHandler.Lifted) {
+
+  def this(partial:EventHandler.Partial) = this(partial.lift)
 
   def consumeImmediately[A <: Event](ev:A) = {
-    fn(ev) map {
+    lifted(ev) map {
       case op:Op => op()
       case _ =>
     }
   }
 
   def ++(other:EventHandler) = new EventHandler( ev => {
-    fn(ev).orElse(other.fn(ev))
+    lifted(ev).orElse(other.lifted(ev))
   })
 
 }
@@ -162,8 +214,7 @@ object EventSinkSpecific {
 
 }
 
-trait EventSinkSpecific[E <: Event] extends Thing {
-  import EventSinkSpecific._
+trait EventSinkSpecific[E <: Event] extends Component {
   def handler:EventHandler
 
 }

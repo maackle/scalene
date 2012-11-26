@@ -5,7 +5,6 @@ import scalene.vector.{vec, vec2}
 import scalene.gfx.SpriteAnimation.FrameOptions
 import scalene.core.Resource
 import scalene.common.{milliseconds => millis}
-import scalene.common
 
 trait Animation extends Render with Update {
   object Mode extends Enumeration {

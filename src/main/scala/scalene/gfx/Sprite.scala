@@ -1,30 +1,25 @@
 package scalene.gfx
 
-import scalene.core.traits.{Thing, Render}
-import scalene.core.{VBO, Resource}
+import scalene.core.traits.{Component, Render}
+import scalene.core.Resource
 import scalene.common._
 import scalene.vector.{vec2, vec}
-import scalene.components.{Position2D, PositionXY}
+import scalene.components.Position2D
 
 trait SpriteLike
-extends Thing
-with Position2D
-with InternalTransform
+extends Position2D
+with AutoTransformer2D
 with Render {
   def image:Image
   protected def imageOffset:vec2
   def scale:vec2
   def rotation:Real
-  def render() {
-    gl.matrix {
-      gl.translate(-imageOffset)
-      image.render()
-    }
+//  def translate = position
+  __transform = __transform & Transform {
+    gl.translate(-imageOffset)
   }
-  val __transform = Transform {
-    gl.translate(this.position)
-    gl.scale(this.scale)
-    gl.rotateRad(this.rotation)
+  def render() {
+    image.render()
   }
 }
 
@@ -33,7 +28,6 @@ trait Spritely extends SpriteLike {
   def imageResource:Resource[Image]
   def imageCenter:vec2 = null
   var scale:vec2 = vec2.one
-
 
   lazy protected val imageOffset =
     if(imageCenter==null) vec(image.width/2, image.height/2) else imageCenter
@@ -51,9 +45,12 @@ class Sprite(
               imageCenter:vec2 = null
               )
 extends SpriteLike {
+
   def this(str:String, position:vec2) = this(Resource(str)(Image.load), position)
+
   lazy protected val imageOffset =
     if(imageCenter==null) vec(image.width/2, image.height/2) else imageCenter
+
   lazy val image = {
     val im = imageResource.is
     im

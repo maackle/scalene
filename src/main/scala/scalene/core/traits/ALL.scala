@@ -1,29 +1,23 @@
 package scalene.core.traits
 
 import collection.mutable
-import scalene.core.Op
-import scalene.gfx.Transform
-import collection.immutable.ListSet
 import scalene.common
 import common.Real
+
+trait Component
 
 trait EnterExit {
   def onEnter(bloc: =>Unit)
   def onExit(bloc: =>Unit)
 }
 
-
-trait Entity extends Thing with Update with Render
+trait Entity extends Component with Update with Render
 
 trait Node {
   protected lazy val children:mutable.Set[Node] = mutable.Set[Node]()
   def +=(n:Node) { children += n }
   def -=(n:Node) { children -= n }
 }
-
-
-trait Thing
-
 
 
 object ID {
@@ -50,22 +44,22 @@ trait Initialize {
   protected def initialize()
 }
 
-trait Render {
+trait Render extends Component {
   def render()
   def __render() = render()
 }
 
-trait PreUpdate {
+trait PreUpdate extends Component {
   def preupdate()
   def __preupdate() = preupdate()
 }
 
-trait Update {
+trait Update extends Component {
   def update()
   def __update() = update()
 }
 
-trait Simulate {
+trait Simulate extends Component {
   def simulate(dt:Real)
   def __simulate(dt:Real) = simulate(dt)
 }

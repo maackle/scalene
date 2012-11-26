@@ -3,14 +3,12 @@ package scalene.gfx
 
 import scalene.misc.Java
 import maackle.util._
-import org.newdawn.slick.{UnicodeFont}
+import org.newdawn.slick.UnicodeFont
 import org.newdawn.slick.font.effects.ColorEffect
 import org.lwjgl.opengl.GL11._
 
 import scalene.vector.{vec, vec2}
-import scalene.core.Resource
 import grizzled.slf4j.Logging
-import java.io.File
 import java.awt
 import org.lwjgl.opengl.GL11
 
