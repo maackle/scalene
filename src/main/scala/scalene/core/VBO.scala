@@ -94,7 +94,7 @@ object VBO {
     val n = vertices.length
 
     val vbuf = {
-      val buf = BufferUtils.createFloatBuffer(n * 2) // TODO: allow Float too
+      val buf = BufferUtils.createFloatBuffer(n * 2)
       val coords:Array[Real] = vertices flatMap(v => Seq(v.x,v.y))
       buf.put(coords)
       buf.flip()
@@ -103,7 +103,7 @@ object VBO {
 
     val tbuf = if(texCoords!=null) {
       assert(n == texCoords.length)
-      val buf = BufferUtils.createFloatBuffer(n * 2) // TODO: allow Float too
+      val buf = BufferUtils.createFloatBuffer(n * 2)
       val coords:Array[Real] = texCoords flatMap(v => Seq(v.x,v.y))
       buf.put(coords)
       buf.flip()
