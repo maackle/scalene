@@ -2,10 +2,12 @@ package scalene.vector
 
 import math._
 
-abstract class vec2base extends vec {
+trait vec2base[@specialized(Float, Double) V] extends vec {
 
-  def x : V
-  def y : V
+//  val fractOps = implicitly[Fractional[V]]
+//  import fractOps._
+  var x : V
+  var y : V
 
   override def equals(other: Any):Boolean = {
     other match {
@@ -16,78 +18,38 @@ abstract class vec2base extends vec {
 
   // hashMap is defined only for the immutable class
 
-  def isValid:Boolean = !x.isNaN && !y.isNaN
-
-  @inline
-  def lengthSquared = x*x + y*y
-  @inline
-  def length = sqrt(lengthSquared)
-  @inline
-  def manhattan = math.abs(x) + math.abs(y)
 
   def nonZero = x != 0 || y != 0
 
-  def rotate(rad:Radian):vec2 = {
-    val ca = cos(rad)
-    val sa = sin(rad)
-    vec ( x*ca - y*sa,
-      y*ca + x*sa )
-  }
+  def length:V
 
   def tuple = (x,y)
 
-  def project(other:vec2):vec2 = {
-    val denom = (other dot other)
-    if(denom < eps) return vec2.zero
-    else other * ((this dot other)/denom)
-  }
+  def project(other:vec2):vec2
 
-  def unit:vec2 = {
-    val len = length
-    if(len < eps || len.isNaN) vec2.zero
-    else this / len
-  }
+  def unit:vec2
 
-  def limit(cap:Float):vec2 = {
-    val len = length
-    if (len > cap && !len.isNaN) {
-      vec(
-        x * cap/len,
-        y * cap/len
-      )
-    }
-    else vec(x,y) // FIXME unnecessary copy
-  }
+  def limit(cap:V):vec2
 
   @inline
-  def angle:Float = {
-    if(x!=0 || y!=0) atan2(y,x).toFloat else 0
-  }
+  def angle:Float
 
-  def flipX = new vec2(-x, y)
-  def flipY = new vec2(x, -y)
+  def flipX:vec2
+  def flipY:vec2
 
-  def +(v:vec2):vec2 = new vec2(x+v.x, y+v.y)
-  def -(v:vec2):vec2 = new vec2(x-v.x, y-v.y)
-  def *(c:V):vec2 = new vec2(x*c, y*c)
-  def *(v:vec2):vec2 = new vec2(x*v.x, y*v.y)
-  def /(c:V):vec2 = new vec2(x/c, y/c)
+  def +(v:vec2):vec2
+  def -(v:vec2):vec2
+  def *(c:V):vec2
+  def *(v:vec2):vec2
+  def /(c:V):vec2
 
   @inline
-  def dot(v:vec2):V = (x*v.x + y*v.y)
+  def dot(v:vec2):V
 
   @inline
   def polar = (length,angle)
 
   @inline
-  def unary_- : vec2 = new vec2(-x, -y)
-
-  @deprecated
-  def <(v:vec2) = x < v.x && y < v.y
-  def <=(v:vec2) = x <= v.x && y <= v.y
-  def >(v:vec2) = x > v.x && y > v.y
-  def >=(v:vec2) = x >= v.x && y >= v.y
-
-  override def toString = "vec2( %s, %s )".format(x,y)
+  def unary_- : vec2
 
 }

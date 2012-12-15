@@ -1,6 +1,6 @@
 package demos
 
-import scalene.core.traits.{Component, Update}
+import scalene.core.traits.{ScaleneMixin, Update}
 import scalene.core.{View2D, State, Op, VBO}
 import scalene.vector.{vec2, vec}
 import org.lwjgl.opengl.GL11
@@ -16,8 +16,8 @@ class LogoTest extends /*State() with*/ EventSink {
   view.zoom = 5
 
   val handler = EventHandler {
-    case KeyHoldEvent(KEY_MINUS) => Op { view.zoom *= 0.99 }
-    case KeyHoldEvent(KEY_EQUALS) => Op { view.zoom *= 1.01 }
+    case KeyHoldEvent(KEY_MINUS) => Op { view.zoom *= 0.99f }
+    case KeyHoldEvent(KEY_EQUALS) => Op { view.zoom *= 1.01f }
   }
 
   object Logo {

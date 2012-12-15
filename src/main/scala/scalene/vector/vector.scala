@@ -2,7 +2,7 @@ package scalene
 
 package object vector {
 
-  type V = Double
+  type V = Float
   type Radian = Double
 
   val eps:V = 0.001f

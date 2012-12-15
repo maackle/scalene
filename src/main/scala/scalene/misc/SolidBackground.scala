@@ -1,7 +1,7 @@
 package scalene.misc
 
 import scalene.gfx.Color
-import scalene.core.traits.{Render, Component}
+import scalene.core.traits.{Render, ScaleneMixin}
 import scalene.gfx
 
 case class SolidBackground(val color:Color) extends Render {

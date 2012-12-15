@@ -14,8 +14,10 @@ object vec extends Logging { self =>
     def gaussian(mean: Double, std: Double): Double = rand.nextGaussian * std + mean
   }
 
-  def apply(x: V, y: V) = new vec2(x,y)
-  def apply(a: (V,V)) = new vec2(a._1, a._2)
+  def apply(x: Float, y: Float) = new vec2(x,y)
+  def apply(a: (Float, Float)) = new vec2(a._1, a._2)
+  def apply(x: Double, y: Double) = new vec2(x,y)
+//  def apply(a: (Double, Double)) = new vec2(a._1, a._2)
 //  def apply(x:V, y:V, z:V) = new vec3(x,y,z)
 //  def apply(a: (V,V,V)) = new vec3(a._1, a._2, a._3)
 
@@ -33,7 +35,8 @@ object vec extends Logging { self =>
   }
 
   object polar {
-    def apply(r:V, t:Radian) = new vec2(r*cos(t), r*sin(t))
+    def apply(r:Float, t:Radian) = new vec2(r*cos(t), r*sin(t))
+    def apply(r:Double, t:Radian) = new vec2(r*cos(t), r*sin(t))
     def apply(p:(V, Radian)) = new vec2(p._1*cos(p._2), p._1*sin(p._2))
     def apply(v:vec2):vec2 = apply(v.length, v.angle)
     def random(r:Float) = polar(Random.uniform(0,r), Random.uniform(0,math.Pi*2))

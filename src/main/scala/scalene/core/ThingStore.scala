@@ -1,7 +1,8 @@
 package scalene.core
 
 import scalene.event.EventSink
-import traits.{Render, Simulate, Update, Component}
+import traits._
+import scala.Some
 
 
 trait ThingStore extends Update {
@@ -28,19 +29,19 @@ trait ThingStore extends Update {
     }
 
     us foreach {
-      case t : Simulate => t.__simulate(1/app.fps.toDouble)
+      case t : Simulate => t.__simulate(1 / app.fps.toFloat)
       case _ =>
     }
 
   }
 
-  protected def += (t:Component) { assert(t!=this); __things += t }
-  protected def -= (t:Component) { assert(t!=this); __things -= t }
-  protected def ++= (t:Seq[Component]) { assert(t!=this); __things ++= t }
-  protected def --= (t:Seq[Component]) { assert(t!=this); __things --= t }
+  protected def += (t:Hook) { assert(t!=this); __things += t }
+  protected def -= (t:Hook) { assert(t!=this); __things -= t }
+  protected def ++= (t:Seq[Hook]) { assert(t!=this); __things ++= t }
+  protected def --= (t:Seq[Hook]) { assert(t!=this); __things --= t }
 
-  private var __things = collection.mutable.Set[Component]()
-  def everything:Set[Component] = __things.toSet
+  private var __things = collection.mutable.Set[Hook]()
+  def everything:Set[Hook] = __things.toSet
   def renderables = __things flatMap {
     case t:Render => Some(t)
     case _ => None

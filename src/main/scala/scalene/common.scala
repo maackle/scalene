@@ -7,7 +7,8 @@ import org.lwjgl.Sys
 
 package object common {
 
-  type Real = Double
+  type Real = Float
+  type Radian = Double
 
   private var __onetimer = collection.mutable.Set[Op]()
 
@@ -39,5 +40,5 @@ package object common {
   def deg2rad(deg:Real) = deg * math.Pi / 180
   def rad2deg(rad:Real) = rad * 180 / math.Pi
 
-  def px(a:Double):Real = 1 / 100 * a
+  def px(a:Real):Real = 1 / 100 * a
 }

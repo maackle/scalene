@@ -6,6 +6,8 @@ import scalene.components.Velocity2D
 import scalene.vector.{vec, vec2}
 import scalene.gfx.{Color, gl, AutoTransformer2D, draw}
 import org.lwjgl.opengl.GL11
+import scalene.common
+import common._
 
 class Pacman(val position:vec2)
   extends Render
@@ -28,7 +30,7 @@ class Pacman(val position:vec2)
     if(velocity.nonZero) rotation = velocity.angle
   }
 
-  def simulate(dt:Double) {}
+  def simulate(dt:Real) {}
 
   def render() {
     val N = 16

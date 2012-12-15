@@ -28,7 +28,7 @@ trait PrimitiveDrawing extends gl {
   protected def getCircle(num:Int):VertexList = {
     if (!circlepts.isDefinedAt(num)) {
       circlepts += num -> {
-        for (i:Int <- Array.range(0, num)) yield ( cos(2.0*Pi*i/num) , sin(2.0*Pi*i/num) )
+        for (i:Int <- Array.range(0, num)) yield ( cos(2.0*Pi*i/num).toFloat , sin(2.0*Pi*i/num).toFloat )
       }
     }
     circlepts(num)
@@ -37,7 +37,7 @@ trait PrimitiveDrawing extends gl {
   @inline def unitCircle(num:Int=100) {
     if (!circlepts.isDefinedAt(num)) {
       circlepts += num -> {
-        for (i:Int <- Array.range(0, num)) yield  ( cos(2.0*Pi*i/num) , sin(2.0*Pi*i/num) )
+        for (i:Int <- Array.range(0, num)) yield ( cos(2.0*Pi*i/num).toFloat , sin(2.0*Pi*i/num).toFloat )
       }
     }
     begin(GL_POLYGON) {

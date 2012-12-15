@@ -3,7 +3,7 @@ package scalene.components
 import scalene.vector._
 import scalene.common
 import common.???
-import scalene.core.traits.{Simulate, Component}
+import scalene.core.traits.{Component, Simulate, ScaleneMixin}
 
 trait Position extends Component { def position: vec }
 trait Position2D extends Component {

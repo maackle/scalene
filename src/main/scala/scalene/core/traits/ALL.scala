@@ -4,14 +4,16 @@ import collection.mutable
 import scalene.common
 import common.Real
 
-trait Component
+trait ScaleneMixin
+trait Component extends ScaleneMixin
+trait Hook extends ScaleneMixin
 
 trait EnterExit {
   def onEnter(bloc: =>Unit)
   def onExit(bloc: =>Unit)
 }
 
-trait Entity extends Component with Update with Render
+trait Entity extends ScaleneMixin with Update with Render
 
 trait Node {
   protected lazy val children:mutable.Set[Node] = mutable.Set[Node]()
@@ -44,22 +46,22 @@ trait Initialize {
   protected def initialize()
 }
 
-trait Render extends Component {
+trait Render extends Hook {
   def render()
   def __render() = render()
 }
 
-trait PreUpdate extends Component {
+trait PreUpdate extends Hook {
   def preupdate()
   def __preupdate() = preupdate()
 }
 
-trait Update extends Component {
+trait Update extends Hook {
   def update()
   def __update() = update()
 }
 
-trait Simulate extends Component {
+trait Simulate extends Hook {
   def simulate(dt:Real)
   def __simulate(dt:Real) = simulate(dt)
 }

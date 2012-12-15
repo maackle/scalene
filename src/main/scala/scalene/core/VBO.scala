@@ -7,6 +7,8 @@ import org.lwjgl.BufferUtils
 import scalene.vector.vec2
 import java.nio.{FloatBuffer, IntBuffer, DoubleBuffer, Buffer}
 import scala.Some
+import scalene.common
+import common._
 
 abstract class VboBuffer[B <: Buffer](val buffer:B, val length:Int) {
   val id = GL15.glGenBuffers()
@@ -25,8 +27,8 @@ class VboIntBuffer(buffer:IntBuffer, len:Int) extends VboBuffer[IntBuffer](buffe
 }
 
 trait VBO /*with Render*/ {
-  def vertices:VboDoubleBuffer
-  def texCoords:Option[VboDoubleBuffer]
+  def vertices:VboFloatBuffer
+  def texCoords:Option[VboFloatBuffer]
   def indices:Option[VboIntBuffer]
   def dim:Int
 
@@ -81,7 +83,7 @@ trait VBO2D extends VBO {
 
 object VBO {
 
-  type BufferT = DoubleBuffer
+  type BufferT = FloatBuffer
 
   val N = 8
 
@@ -92,8 +94,8 @@ object VBO {
     val n = vertices.length
 
     val vbuf = {
-      val buf = BufferUtils.createDoubleBuffer(n * 2) // TODO: allow Float too
-      val coords:Array[Double] = vertices flatMap(v => Seq(v.x,v.y))
+      val buf = BufferUtils.createFloatBuffer(n * 2) // TODO: allow Float too
+      val coords:Array[Real] = vertices flatMap(v => Seq(v.x,v.y))
       buf.put(coords)
       buf.flip()
       buf
@@ -101,8 +103,8 @@ object VBO {
 
     val tbuf = if(texCoords!=null) {
       assert(n == texCoords.length)
-      val buf = BufferUtils.createDoubleBuffer(n * 2) // TODO: allow Float too
-      val coords:Array[Double] = texCoords flatMap(v => Seq(v.x,v.y))
+      val buf = BufferUtils.createFloatBuffer(n * 2) // TODO: allow Float too
+      val coords:Array[Real] = texCoords flatMap(v => Seq(v.x,v.y))
       buf.put(coords)
       buf.flip()
       Some(buf)
@@ -118,8 +120,8 @@ object VBO {
       }
     }
     new VBO2D {
-      val vertices = new VboDoubleBuffer(vbuf, n)
-      val texCoords = tbuf map { new VboDoubleBuffer(_, n) }
+      val vertices = new VboFloatBuffer(vbuf, n)
+      val texCoords = tbuf map { new VboFloatBuffer(_, n) }
       val indices = ixs
     }
   }

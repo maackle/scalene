@@ -5,7 +5,7 @@ import scalene.input.LWJGLKeyboard
 import scalene.core.{View2D, Op}
 import scalene.helpers.MemBoolean
 import org.lwjgl.input.{Keyboard=>Kbd}
-import scalene.core.traits.{Component, Update}
+import scalene.core.traits.{ScaleneMixin, Update}
 import collection.mutable
 import grizzled.slf4j.Logging
 import scalene.vector.vec2
@@ -214,7 +214,7 @@ object EventSinkSpecific {
 
 }
 
-trait EventSinkSpecific[E <: Event] extends Component {
+trait EventSinkSpecific[E <: Event] extends ScaleneMixin {
   def handler:EventHandler
 
 }

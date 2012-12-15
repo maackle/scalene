@@ -6,10 +6,10 @@ import traits.Render
 import java.nio.{FloatBuffer, IntBuffer}
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
-import scalene.vector._
 import org.lwjgl.util.glu.GLU
 import scalene.common._
 import scalene.misc.SolidBackground
+import scalene.vector.{vec, vec2}
 
 trait View extends Render with InternalTransform {
 

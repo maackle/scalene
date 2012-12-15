@@ -1,6 +1,6 @@
 package scalene.core
 
-import traits.{Component, Render}
+import traits.{ScaleneMixin, Render}
 import scalene.gfx.gl
 
 object Op {

@@ -1,10 +1,12 @@
 package scalene.gfx
 
-import scalene.core.traits.{Component, Render}
+import scalene.core.traits.{ScaleneMixin, Render}
 import scalene.core.Resource
 import scalene.common._
 import scalene.vector.{vec2, vec}
 import scalene.components.Position2D
+import scalene.common
+import common._
 
 trait SpriteLike
 extends Position2D
@@ -13,7 +15,7 @@ with Render {
   def image:Image
   protected def imageOffset:vec2
   def scale:vec2
-  def rotation:Real
+  def rotation:Radian
 //  def translate = position
   __transform = __transform & Transform {
     gl.translate(-imageOffset)
@@ -41,7 +43,7 @@ class Sprite(
               imageResource:Resource[Image],
               var position:vec2,
               var scale:vec2 = vec2.one,
-              var rotation:Real = 0,
+              var rotation:Radian = 0,
               imageCenter:vec2 = null
               )
 extends SpriteLike {

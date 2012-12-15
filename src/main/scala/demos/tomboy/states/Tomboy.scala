@@ -8,7 +8,7 @@ import scalene.event._
 import scalene.input.LWJGLKeyboard
 import scalene.core.{View2D, Domain, State}
 import scalene.event.KeyDownEvent
-import scalene.core.traits.{Component, Simulate, Render}
+import scalene.core.traits.{ScaleneMixin, Simulate, Render}
 import scalene.audio.SoundStore
 
 object Tomboy extends Domain(null) {
@@ -42,8 +42,8 @@ object Tomboy extends Domain(null) {
 
     def render() {
       color.bind()
-      font.drawString(boyLeft.score.toString, vec(-scoreDist, h * 0.5), Line.color)
-      font.drawString(boyRight.score.toString, vec(scoreDist, h * 0.5), Line.color)
+      font.drawString(boyLeft.score.toString, vec(-scoreDist, h * 0.5f), Line.color)
+      font.drawString(boyRight.score.toString, vec(scoreDist, h * 0.5f), Line.color)
       draw.rect(thickness, 2*h)
     }
   }
@@ -131,7 +131,7 @@ object Tomboy extends Domain(null) {
     this ++= boys
 
     val handler = (
-      zoomer(view, 0.99)(KEY_MINUS, KEY_EQUALS)
+      zoomer(view, 0.99f)(KEY_MINUS, KEY_EQUALS)
       ++ panner(view, 4)(KEY_W, KEY_A, KEY_S, KEY_D)
     )
 
