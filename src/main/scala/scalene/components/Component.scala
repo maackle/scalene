@@ -3,7 +3,7 @@ package scalene.components
 import scalene.vector._
 import scalene.common
 import common.???
-import scalene.core.traits.{Component, Simulate, ScaleneMixin}
+import scalene.core.traits.{Render, Component, Simulate, ScaleneMixin}
 import scalene.gfx.draw
 
 trait Position extends Component { def position: vec }
@@ -49,7 +49,7 @@ trait Acceleration2D extends Component with Velocity2D {
 //  def hitTest(other:Shape):Boolean
 //  def hitTest(point:vec):Boolean
 //}
-trait Shape2D extends Position2D {
+trait Shape2D extends Position2D with Render {
   def hitTest(other:Shape2D):Boolean
   def hitTest(other:vec2):Boolean
 }
@@ -69,13 +69,17 @@ trait CircleShape extends Shape2D {
     case rect:RectangleShape =>
       ???
   }
+
+  def render() {
+    draw.circle(radius)
+  }
 }
 
 trait PolygonShape extends Shape2D {
 
 }
 
-trait RectangleShape extends PolygonShape with Position2D {
+trait RectangleShape extends PolygonShape {
 
   def width:common.Real
   def height:common.Real

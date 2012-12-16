@@ -40,6 +40,7 @@ object vec extends Logging { self =>
     def apply(p:(V, Radian)) = new vec2(p._1*cos(p._2), p._1*sin(p._2))
     def apply(v:vec2):vec2 = apply(v.length, v.angle)
     def random(r:Float) = polar(Random.uniform(0,r), Random.uniform(0,math.Pi*2))
+    def random(r:Float, ang0:Radian, ang1:Radian) = polar(Random.uniform(0,r), Random.uniform(ang0, ang1))
   }
 
   /*** 3-D ***/

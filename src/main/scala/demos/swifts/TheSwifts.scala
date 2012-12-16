@@ -1,6 +1,7 @@
 package demos.swifts
 
-import scalene.core.ScaleneApp
+import scalene.core.{ScaleneAppDebug, ScaleneApp}
+import scalene.gfx.Color
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,9 +10,11 @@ import scalene.core.ScaleneApp
  * Time: 3:33 PM
  * To change this template use File | Settings | File Templates.
  */
-object TheSwifts extends ScaleneApp {
-  val windowSize = Some(600,600)
+object TheSwifts extends ScaleneApp with ScaleneAppDebug {
+  val windowSize = Some(1000,1000)
   val windowTitle = "The Swifts"
 
   lazy val startState = new states.Play
+
+  val debugColor = Color.black
 }

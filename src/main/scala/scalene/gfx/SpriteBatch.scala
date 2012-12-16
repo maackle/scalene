@@ -8,9 +8,6 @@ import scalene.vector.vec2
 import scalene.common._
 import org.lwjgl.opengl.GL11
 
-object RenderBatch {
-  type MM = Position2D with Rotation
-}
 trait RenderBatch extends Render with Update with IndexedThingStore[Position2D with Rotation] {
 
   def N:Int

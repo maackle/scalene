@@ -92,7 +92,7 @@ object Layer2D {
 }
 class Layer2D(val parallax:Real)(protected val things:Seq[Render]) extends Layer {
   val __transform = Transform {
-    gl.scale(vec(parallax, parallax))
+//    gl.scale(vec(parallax, parallax))
   }
   def toSeq = things
 }
