@@ -28,8 +28,15 @@ trait vec2mutable extends vec2base[V] {
   def rotate(rad:Radian):vec2 = {
     val ca = cos(rad)
     val sa = sin(rad)
-    vec ( x*ca - y*sa,
-      y*ca + x*sa )
+    vec (
+      x*ca - y*sa,
+      y*ca + x*sa
+    )
+  }
+
+  def clear() {
+    x = 0
+    y = 0
   }
 
   def project(other:vec2):vec2 = {

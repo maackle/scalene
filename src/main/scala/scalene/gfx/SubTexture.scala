@@ -35,7 +35,6 @@ trait SubTexture extends Textured {
         vertices = vertices,
         texCoords = texCoords
       )
-    vbo.setup()
     vbo
   }
 

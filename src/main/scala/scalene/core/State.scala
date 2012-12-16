@@ -1,6 +1,6 @@
 package scalene.core
 
-import traits.Render
+import traits.{Hook, Render}
 import scalene.event.EventSink
 import scalene.input.LWJGLKeyboard
 
@@ -16,11 +16,11 @@ abstract class ScaleneSketch
   with EventSink
   with LWJGLKeyboard
 
-trait StateEventHandling extends ThingStore {
+trait StateEventHandling extends ThingStore[Hook] {
 
   abstract override def __update() {
     super.__update()
-    val sinks:Set[EventSink] = (everything + this) flatMap {
+    val sinks = (everything ++ Traversable(this)) flatMap {
       case s:EventSink => Some(s)
       case _ => None
     }
@@ -34,7 +34,7 @@ trait StateEventHandling extends ThingStore {
   }
 }
 
-trait StateMixin extends ScaleneApp with ThingStore with StateEventHandling with Render { self =>
+trait StateMixin extends ScaleneApp with ThingStore[Hook] with StateEventHandling with Render { self =>
 
   def app = this
   val view:View2D
@@ -50,13 +50,14 @@ trait StateMixin extends ScaleneApp with ThingStore with StateEventHandling with
 
 }
 
-abstract class State(val app:ScaleneApp) extends ThingStore with StateEventHandling with Render {
+abstract class State(val app:ScaleneApp) extends HashedThingStore[Hook] with StateEventHandling with Render {
   def this(domain:Domain) = this(domain.app)
   val view:View2D
 
   protected def onEnter(bloc: =>Unit) {}
   protected def onExit(bloc: =>Unit) {}
 
+  def update() { /* typically handled by ThingStore */ }
   def render() {
     if(view!=null) view.__render()
   }

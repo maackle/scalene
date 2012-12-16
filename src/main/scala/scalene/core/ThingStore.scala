@@ -4,8 +4,25 @@ import scalene.event.EventSink
 import traits._
 import scala.Some
 
+trait IndexedThingStore[M] extends ThingStore[M] {
+  protected var __things = collection.mutable.IndexedSeq[M]()
+//  override def everything:IndexedSeq[M] = __things
 
-trait ThingStore extends Update {
+  protected def += (t:M) { assert(t!=this); __things ++ Seq(t) }
+  protected def ++= (t:Seq[M]) { assert(t!=this); __things ++= t }
+}
+
+trait HashedThingStore[M] extends ThingStore[M] {
+
+  protected def += (t:M) { assert(t!=this); __things += t }
+  protected def ++= (t:Seq[M]) { assert(t!=this); __things ++= t }
+  protected def -= (t:M) { assert(t!=this); __things -= t }
+  protected def --= (t:Seq[M]) { assert(t!=this); __things --= t }
+
+  protected var __things = collection.mutable.Set[M]()
+}
+
+trait ThingStore[M] extends Update {
 
   def app:ScaleneApp
 
@@ -15,33 +32,19 @@ trait ThingStore extends Update {
 //    }
 //  }
 
-  def update() {}
-
   abstract override def __update() {
 
     super.__update()
 
-    val us = everything
-
-    us foreach {
-      case t : Update => t.__update()
-      case _ =>
+    for (t <- everything) {
+      if (t.isInstanceOf[Update]) t.asInstanceOf[Update].__update()
+      if (t.isInstanceOf[Simulate]) t.asInstanceOf[Simulate].__simulate(1 / app.fps.toFloat)
     }
-
-    us foreach {
-      case t : Simulate => t.__simulate(1 / app.fps.toFloat)
-      case _ =>
-    }
-
   }
 
-  protected def += (t:Hook) { assert(t!=this); __things += t }
-  protected def -= (t:Hook) { assert(t!=this); __things -= t }
-  protected def ++= (t:Seq[Hook]) { assert(t!=this); __things ++= t }
-  protected def --= (t:Seq[Hook]) { assert(t!=this); __things --= t }
+  protected def __things:Traversable[M]
+  def everything:Traversable[M] = __things
 
-  private var __things = collection.mutable.Set[Hook]()
-  def everything:Set[Hook] = __things.toSet
   def renderables = __things flatMap {
     case t:Render => Some(t)
     case _ => None

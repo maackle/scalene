@@ -4,6 +4,7 @@ import scalene.vector._
 import scalene.common
 import common.???
 import scalene.core.traits.{Component, Simulate, ScaleneMixin}
+import scalene.gfx.draw
 
 trait Position extends Component { def position: vec }
 trait Position2D extends Component {
@@ -74,7 +75,7 @@ trait PolygonShape extends Shape2D {
 
 }
 
-trait RectangleShape extends PolygonShape {
+trait RectangleShape extends PolygonShape with Position2D {
 
   def width:common.Real
   def height:common.Real
@@ -113,5 +114,9 @@ trait RectangleShape extends PolygonShape {
         }
         tests.reduce(_ && _)
     }
+  }
+
+  def render() {
+    scalene.gfx.draw.rect(width, height)
   }
 }

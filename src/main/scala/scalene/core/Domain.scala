@@ -1,6 +1,6 @@
 package scalene.core
 
-import traits.Update
+import traits.{Hook, Update}
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,8 +9,9 @@ import traits.Update
  * Time: 10:48 AM
  * To change this template use File | Settings | File Templates.
  */
-abstract class Domain(val app:ScaleneApp) extends ThingStore with Update {
+abstract class Domain(val app:ScaleneApp) extends HashedThingStore[Hook] with Update {
 
+  def update = ()
   def currentState:State = app.currentState
 
   //TODO: a way to define an initialize() method that is called once onEnter for a State in this Domain

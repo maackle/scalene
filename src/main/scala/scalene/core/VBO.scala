@@ -1,6 +1,6 @@
 package scalene.core
 
-import org.lwjgl.opengl.{GL13, GL15}
+import org.lwjgl.opengl.{GL11, GL13, GL15}
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.BufferUtils
@@ -10,119 +10,155 @@ import scala.Some
 import scalene.common
 import common._
 
-abstract class VboBuffer[B <: Buffer](val buffer:B, val length:Int) {
+abstract class VboBuffer[+B <: Buffer](val length:Int) {
   val id = GL15.glGenBuffers()
 }
-class VboDoubleBuffer(buffer:DoubleBuffer, len:Int) extends VboBuffer[DoubleBuffer](buffer, len) {
-  GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, id)
-  GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW)
-}
-class VboFloatBuffer(buffer:FloatBuffer, len:Int) extends VboBuffer[FloatBuffer](buffer, len) {
-  GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, id)
-  GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW)
-}
-class VboIntBuffer(buffer:IntBuffer, len:Int) extends VboBuffer[IntBuffer](buffer, len) {
-  GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, id)
-  GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW)
+
+class VboFloatBuffer(len:Int) extends VboBuffer[FloatBuffer](len) {
+
+  val buffer:FloatBuffer = BufferUtils.createFloatBuffer(len)
+
+  def setRaw(vs:Array[Float], mode:Int = GL15.GL_STREAM_DRAW) = {
+    buffer.put(vs)
+    buffer.flip()
+    GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, id)
+    GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, mode)
+    this
+  }
+
+  def set(ps:Array[vec2], mode:Int = GL15.GL_STREAM_DRAW) = {
+    setRaw(ps flatMap ( p => Seq(p.x, p.y)), mode)
+  }
 }
 
-trait VBO /*with Render*/ {
+class VboIntBuffer(len:Int) extends VboBuffer[IntBuffer](len) {
+  val buffer:IntBuffer = BufferUtils.createIntBuffer(len)
+
+  def set(a:Array[Int], mode:Int = GL15.GL_STREAM_DRAW) = {
+    buffer.put(a)
+    buffer.flip()
+    GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, id)
+    GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, mode)
+    this
+  }
+}
+
+trait VBO {
   def vertices:VboFloatBuffer
   def texCoords:Option[VboFloatBuffer]
-  def indices:Option[VboIntBuffer]
-  def dim:Int
+  def dim:Int = 2
 
-//  def render() { draw(method) }
+  import VBO._
 
-  def setup() {
-    glBindBuffer(GL_ARRAY_BUFFER, vertices.id)
-    glBufferData(GL_ARRAY_BUFFER, vertices.buffer, GL_STATIC_DRAW)
+  def updateVertices(vs:Array[v]) = vertices.set(vs)
 
-    texCoords map { texCoords =>
-      glBindBuffer(GL_ARRAY_BUFFER, texCoords.id)
-      glBufferData(GL_ARRAY_BUFFER, texCoords.buffer, GL_STATIC_DRAW)
-    }
-
-  }
-
-  def update(verts:Array[vec2]) { //, texCoords:Array[vec2]=null, indices:Array[Int]=null) {
-
-  }
-
-  def draw(method:Int) {
+  protected def wrapDraw(fn: =>Unit) {
     glEnableClientState(GL_VERTEX_ARRAY)
     if(texCoords.isDefined) glEnableClientState(GL_TEXTURE_COORD_ARRAY)
 
     glBindBuffer(GL_ARRAY_BUFFER, vertices.id)
-    glVertexPointer(dim, GL_DOUBLE, 0, 0)
+    glVertexPointer(dim, GL_FLOAT, 0, 0)
 
     texCoords map { texCoords =>
-      assert(texCoords.length == vertices.length)
       glBindBuffer(GL_ARRAY_BUFFER, texCoords.id)
       GL13.glClientActiveTexture(GL13.GL_TEXTURE0)
-      glTexCoordPointer(2, GL_DOUBLE, 0, 0)
+      glTexCoordPointer(2, GL_FLOAT, 0, 0)
     }
 
-    indices match {
-      case Some(indices) =>
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices.id)
-        glDrawElements(method, indices.length, GL_UNSIGNED_INT, 0)
-      case _ =>
-        glDrawArrays(method, 0, vertices.length)
-    }
+    fn
+
     glBindBuffer(GL_ARRAY_BUFFER, GL_NONE)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_NONE)
     glDisableClientState(GL_VERTEX_ARRAY)
     glDisableClientState(GL_TEXTURE_COORD_ARRAY)
   }
+
+  def draw(method:Int) = wrapDraw {
+    glDrawArrays(method, 0, vertices.length)
+  }
 }
 
-trait VBO2D extends VBO {
-  val dim = 2
+trait VBO_Patchy extends VBO {
+  def patchSize:Int
+
+  def drawWithPatches(method:Int) {
+    import org.lwjgl.opengl.GL40
+
+    GL40.glPatchParameteri(GL40.GL_PATCH_VERTICES, patchSize); //TODO: only for opengl 4!
+    draw(GL40.GL_PATCHES)
+  }
+
+  override def draw(method:Int = GL11.GL_POLYGON) = {
+    for (i <- 0 to vertices.length) {
+      glDrawArrays(method, i*patchSize, patchSize)
+    }
+  }
+
+  def drawOne(which:Int, method:Int = GL11.GL_POLYGON) = wrapDraw {
+    glDrawArrays(method, which, patchSize)
+  }
+}
+
+trait VBO_Indexed extends VBO {
+  def vertices:VboFloatBuffer
+  def texCoords:Option[VboFloatBuffer]
+  def indices:Option[VboIntBuffer]
+  def consecutive:Int
+
+  import VBO._
+
+  override def draw(method:Int) = wrapDraw {
+    indices match {
+      case Some(indices) =>
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices.id)
+        glDrawElements(method, indices.length, GL_UNSIGNED_INT, 0)
+      case _ =>
+        glDrawArrays(method, 0, consecutive)
+    }
+  }
 }
 
 object VBO {
 
-  type BufferT = FloatBuffer
+  type v = vec2
+  val dim = 2
 
-  val N = 8
 
-  var vbuf_id = 0
-  var ixbuf_id = 0
+  def create(size:Int, useTextures:Boolean, useIndices:Boolean) = {
+    val n = size
 
-  def create[v <: vec2](vertices:Array[v], texCoords:Array[v]=null, indices:Array[Int]=null) = {
-    val n = vertices.length
+    val vs = new VboFloatBuffer(n * dim)
 
-    val vbuf = {
-      val buf = BufferUtils.createFloatBuffer(n * 2)
-      val coords:Array[Real] = vertices flatMap(v => Seq(v.x,v.y))
-      buf.put(coords)
-      buf.flip()
-      buf
-    }
+    val ts = if (useTextures) Some(new VboFloatBuffer(n * 2)) else None
 
-    val tbuf = if(texCoords!=null) {
-      assert(n == texCoords.length)
-      val buf = BufferUtils.createFloatBuffer(n * 2)
-      val coords:Array[Real] = texCoords flatMap(v => Seq(v.x,v.y))
-      buf.put(coords)
-      buf.flip()
-      Some(buf)
-    } else None
+    val ixs = if (useTextures) Some(new VboIntBuffer(n)) else None
 
-    val ixs = {
-      if(indices==null) None
-      else {
-        val ixbuf = BufferUtils.createIntBuffer(indices.length)
-        ixbuf.put(indices)
-        ixbuf.flip()
-        Some(new VboIntBuffer(ixbuf, indices.length))
-      }
-    }
-    new VBO2D {
-      val vertices = new VboFloatBuffer(vbuf, n)
-      val texCoords = tbuf map { new VboFloatBuffer(_, n) }
+    new VBO {
+      val vertices = vs
+      val texCoords = ts
       val indices = ixs
     }
   }
+
+  def create(vertices:Array[v], texCoords:Array[v]=null, indices:Array[Int]=null) = {
+    val n = vertices.length
+    assert(n == texCoords.length)
+
+    val vs = new VboFloatBuffer(n * dim).set(vertices, GL_STATIC_DRAW)
+
+    val ts = for(texCoords <- Option(texCoords)) yield {
+      new VboFloatBuffer(n * 2).set(texCoords, GL_STATIC_DRAW)
+    }
+
+    val ixs = Option(indices) map { indices =>
+      new VboIntBuffer(n).set(indices, GL_STATIC_DRAW)
+    }
+
+    new VBO {
+      val vertices = vs
+      val texCoords = ts
+      val indices = ixs
+    }
+  }
+
 }

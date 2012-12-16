@@ -61,7 +61,7 @@ class Paddle(arena:Arena, side:Arena.Side, controls:Paddle.Controls)
 
   def simulate(dt:Real) {}
 
-  def render() {
+  override def render() {
     Color.white.bind()
     draw.rect(thickness, height)
   }
@@ -94,7 +94,7 @@ class Ball(direction:Arena.Side)
 
   def simulate(dt:Real) {}
 
-  def render() {
+  override def render() {
     Color.white.bind()
     draw.circle(radius)
   }

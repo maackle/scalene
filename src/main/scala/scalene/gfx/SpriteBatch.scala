@@ -1,21 +1,48 @@
 package scalene.gfx
 
-import scalene.core.{VboIntBuffer, VboFloatBuffer, VBO, Resource}
-import scalene.core.traits.Render
-import scalene.components.Position2D
+import scalene.core._
+import scalene.core.traits.{Update, Render}
+import scalene.components.{Rotation, Position2D}
 import collection.mutable
+import scalene.vector.vec2
+import scalene.common._
+import org.lwjgl.opengl.GL11
 
-trait RenderBatch extends Render {
+object RenderBatch {
+  type MM = Position2D with Rotation
+}
+trait RenderBatch extends Render with Update with IndexedThingStore[Position2D with Rotation] {
 
-  type M = Position2D
-  private var things:List[Traversable[M]]
-  private val buf = new scalene.core.VboFloatBuffer()
+  def N:Int
+  def drawMode:Int
 
-  def +=(thing:M) = things ::= new M {
-    def position = thing.position
+//  protected var positions:Array[vec2] = null
+//  protected var rotations:Array[Radian] = null
+  def vbo:VBO
+
+  def update()
+
+  def render() {
+    vbo.draw(drawMode)
   }
 
+}
 
+trait VectorBatch extends RenderBatch {
+
+  def shape:Array[vec2]
+  lazy val vbo = VBO.create(N, false, false)
+
+  def update() {
+    val a = for (t <- everything; s <- shape) yield {
+      (t.position + s.rotate(t.rotation))
+    }
+    vbo.updateVertices(a.toArray)
+  }
+}
+
+trait TriangleBatch extends VectorBatch {
+  val drawMode = GL11.GL_TRIANGLES
 }
 
 trait SpriteBatch extends RenderBatch {
@@ -24,9 +51,9 @@ trait SpriteBatch extends RenderBatch {
   def imageResource:Resource[Image]
 
   // TODO: use single VBO for entire batch
-  def render() {
+  override def render() {
     val image = imageResource.is
-    things.map { t =>
+    everything.map { t =>
       val pos = t.position
       gl.matrix {
         gl.translate(pos)
@@ -36,7 +63,8 @@ trait SpriteBatch extends RenderBatch {
   }
 }
 
-class SpriteBatchGhetto(val imageResource:Resource[Image]) extends SpriteBatch {
-  val things = mutable.Set()
-
-}
+//class SpriteBatchGhetto(val imageResource:Resource[Image]) extends SpriteBatch {
+//
+//  val things = mutable.Set()
+//
+//}

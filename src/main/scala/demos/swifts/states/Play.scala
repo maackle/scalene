@@ -1,8 +1,12 @@
 package demos.swifts.states
 
 import scalene.core.{View2D, State}
-import demos.swifts.Swifts
-import scalene.gfx.Color
+import demos.swifts.TheSwifts
+import scalene.gfx.{VectorBatch, Color}
+import demos.swifts.things.{SwiftSwarm, Swift}
+import org.lwjgl.opengl.GL11
+import scalene.vector.{vec2, vec}
+import scalene.event.HandyHandlers
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,8 +15,15 @@ import scalene.gfx.Color
  * Time: 3:34 PM
  * To change this template use File | Settings | File Templates.
  */
-class Play extends State(Swifts) {
+class Play extends State(TheSwifts) with HandyHandlers {
 
-  val swifts = List()
-  val view = View2D.simple(Color(0x555555), swifts)
+  val swarm = new SwiftSwarm(1000)
+
+  this += swarm
+
+  val view = View2D.simple(Color(0x7ebcbb), swarm)
+
+  val handler = {
+    zoomer(view, 0.99f)() ++ panner(view, 5)()
+  }
 }
