@@ -60,7 +60,7 @@ object Color {
 
 }
 
-case class Color(r: Float, g: Float, b: Float, a: Float = 1.0f) {
+class Color(var r: Float, var g: Float, var b: Float, var a: Float = 1.0f) {
 
   @inline
   def bind() {
@@ -78,18 +78,20 @@ case class Color(r: Float, g: Float, b: Float, a: Float = 1.0f) {
 
   def toSlick = new slick.Color(r, g, b, a)
 
-  def inverted = Color(1 - r, 1 - g, 1 - b, a)
+  def inverted = new Color(1 - r, 1 - g, 1 - b, a)
+
+  def alpha(A:Float) = { new Color(r,g,b,A) }
 
   def value = (r + g + b) / 3
 
   //NOTE: what to do about alpha values?
-  def +(o: Color) = Color(r + o.r, g + o.g, b + o.b, (a + o.a) / 2)
+  def +(o: Color) = new Color(r + o.r, g + o.g, b + o.b, (a + o.a) / 2)
 
-  def -(o: Color) = Color(r - o.r, g - o.g, b - o.b, (a + o.a) / 2)
+  def -(o: Color) = new Color(r - o.r, g - o.g, b - o.b, (a + o.a) / 2)
 
-  def *(v: Float) = Color(clamp(r * v, 0, 1), clamp(g * v, 0, 1), clamp(b * v, 0, 1), a)
+  def *(v: Float) = new Color(clamp(r * v, 0, 1), clamp(g * v, 0, 1), clamp(b * v, 0, 1), a)
 
-  def **(v: Float) = Color(1 - r / v, 1 - g / v, 1 - b / v, a)
+  def **(v: Float) = new Color(1 - r / v, 1 - g / v, 1 - b / v, a)
 
-  def /(v: Float) = Color(r / v, g / v, b / v, a)
+  def /(v: Float) = new Color(r / v, g / v, b / v, a)
 }

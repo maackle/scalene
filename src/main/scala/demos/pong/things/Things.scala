@@ -59,7 +59,7 @@ class Paddle(arena:Arena, side:Arena.Side, controls:Paddle.Controls)
       velocity.y = 0
   }
 
-  def simulate(dt:Real) {}
+  def simulate(dt:Float) = ()
 
   override def render() {
     Color.white.bind()
@@ -92,7 +92,7 @@ class Ball(direction:Arena.Side)
     maackle.util.Random.uniform(center - spread, center + spread)
   }
 
-  def simulate(dt:Real) {}
+  def simulate(dt:Float) = ()
 
   override def render() {
     Color.white.bind()

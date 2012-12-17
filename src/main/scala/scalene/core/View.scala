@@ -79,7 +79,11 @@ object View2D {
 object Layer2D {
   def apply(parallax:Real, thing:Render):Layer2D = apply(parallax, Seq(thing))
   def apply(parallax:Real, things:Seq[Render]) = {
-    new Layer2D(parallax)(things)
+    new Layer2D(things, parallax)
+  }
+  def apply(thing:Render):Layer2D = apply(Seq(thing))
+  def apply(things:Seq[Render]) = {
+    new Layer2D(things, 1)
   }
 
 //  def apply(parallax:Real)(things:Render*) = {
@@ -90,9 +94,10 @@ object Layer2D {
 //  }
 
 }
-class Layer2D(val parallax:Real)(protected val things:Seq[Render]) extends Layer {
+class Layer2D(protected val things:Seq[Render], val parallax:Real=1) extends Layer {
   val __transform = Transform {
-//    gl.scale(vec(parallax, parallax))
+    if(parallax!=1)
+      gl.scale(vec(parallax, parallax))
   }
   def toSeq = things
 }

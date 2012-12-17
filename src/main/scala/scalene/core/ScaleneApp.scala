@@ -103,9 +103,9 @@ with Initialize {
     Display.setVSyncEnabled(vsync)
     if(fullscreen) Display.setFullscreen(true)
     else Display.setDisplayMode(new DisplayMode(_winsize._1, _winsize._2))
-    val pxfmt = new PixelFormat().withDepthBits(24).withSamples(4).withSRGB(true)
+    val pxfmt = new PixelFormat().withDepthBits(24).withSRGB(true)
     val ctxAttr = new ContextAttribs(3, 0)//.withForwardCompatible(true);
-//    contextAtrributes.withProfileCore(true);
+//    ctxAttr.withProfileCore(true);
     Display.create(pxfmt, ctxAttr)
     Logger("ScaleneApp").info("Display created")
     Logger("ScaleneApp").info("bpp: " + Display.getDisplayMode.getBitsPerPixel)

@@ -21,6 +21,11 @@ trait Resource[O] {
 
 object Resource extends Logging {
 
+  object Image {
+    import scalene.gfx.{Image=>Im}
+    def apply(locator:Locator) = Resource(locator)(Im.load)
+  }
+
   type Locator = String
   private val needsLoading = collection.mutable.Set[Resource[_]]()
   private val registered = collection.mutable.Map[Locator, Resource[_]]()

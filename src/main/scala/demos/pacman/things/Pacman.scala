@@ -30,7 +30,7 @@ class Pacman(val position:vec2)
     if(velocity.nonZero) rotation = velocity.angle
   }
 
-  def simulate(dt:Real) {}
+  def simulate(dt:Float) = ()
 
   def render() {
     val N = 16

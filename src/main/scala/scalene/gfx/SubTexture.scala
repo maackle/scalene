@@ -29,14 +29,6 @@ trait SubTexture extends Textured {
     vec(texWidth, texHeight),
     vec(0, texHeight)
   )
-  lazy val vbo = {
-    val vbo =
-      VBO.create(
-        vertices = vertices,
-        texCoords = texCoords
-      )
-    vbo
-  }
 
   def blit(color:Color = Color.white) {
     color.bind()

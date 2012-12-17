@@ -16,7 +16,7 @@ import scalene.components.CircleShape
  * Time: 3:34 PM
  * To change this template use File | Settings | File Templates.
  */
-class Play extends State(TheSwifts) with HandyHandlers {
+class PlayState extends State(TheSwifts) with HandyHandlers {
 
   val hawk = new Hawk
 

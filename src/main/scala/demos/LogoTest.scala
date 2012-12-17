@@ -48,7 +48,7 @@ class LogoTest extends /*State() with*/ EventSink {
       verts foreach( println(_) )
       (verts, indices)
     }
-    val vbo = VBO.create(verts, indices=indices)
+    val vbo = VBO.createAndLoad(verts, indices=indices)
   }
   class Logo(var position:vec2) extends Update with AutoTransformer2D {
     var rotation = 0.0

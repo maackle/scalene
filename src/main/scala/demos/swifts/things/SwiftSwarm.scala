@@ -3,7 +3,7 @@ package demos.swifts.things
 import scalene.gfx._
 import org.lwjgl.opengl.GL11
 import scalene.vector.{vec2, vec}
-import scalene.core.ThingStore
+import scalene.core.{VBO, ThingStore}
 import demos.swifts.TheSwifts
 import scalene.common
 import scalene.misc.ScaleneGrid
@@ -14,13 +14,14 @@ import scalene.core.traits.Render
 
 class SwiftSwarm(size:Int, val hawk:Hawk) extends TriangleBatch {
 
-  val N = size * 3
+  val vertexCapacity = size * 3
 
   val numGridDivisions = 50
   val arenaDim = 2000f
 
   val arenaColor = Color(0x7ebcbb)
 
+  val vbo = VBO.create(vertexCapacity, false, false, false)
 
   class GridCell {
 //    val velocity = vec2.zero
@@ -191,11 +192,7 @@ class SwiftSwarm(size:Int, val hawk:Hawk) extends TriangleBatch {
     super.update()
   }
 
-  override def render() {
-    draw.fill(true)
-
-    arenaColor.bind()
-    arena.render()
+  def drawGrid() {
 
     Color(0xaaaadd).bind()
     val d = grid.xDim
@@ -209,7 +206,17 @@ class SwiftSwarm(size:Int, val hawk:Hawk) extends TriangleBatch {
     for(y <- 0 to grid.ycells) {
       draw.line( grid.bottomLeft + vec(0, y*d), grid.bottomLeft + vec(grid.xcells*d, y*d) )
     }
-    Color.black.bind()
+  }
+
+  override def render() {
+    draw.fill(true)
+
+    arenaColor.bind()
+    arena.render()
+
+//    drawGrid()
+
+    Color(0x333333).bind()
     super.render()
 
 

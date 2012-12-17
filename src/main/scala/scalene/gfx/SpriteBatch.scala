@@ -8,9 +8,9 @@ import scalene.vector.vec2
 import scalene.common._
 import org.lwjgl.opengl.GL11
 
-trait RenderBatch extends Render with Update with IndexedThingStore[Position2D with Rotation] {
+trait RenderBatch[T] extends Render with Update with IndexedThingStore[T] {
 
-  def N:Int
+  def vertexCapacity:Int
   def drawMode:Int
 
 //  protected var positions:Array[vec2] = null
@@ -25,24 +25,37 @@ trait RenderBatch extends Render with Update with IndexedThingStore[Position2D w
 
 }
 
-trait VectorBatch extends RenderBatch {
-
-  def shape:Array[vec2]
-  lazy val vbo = VBO.create(N, false, false)
+trait VectorBatch[T <: Position2D] extends RenderBatch[T] {
 
   def update() {
-    val a = for (t <- everything; s <- shape) yield {
-      (t.position + s.rotate(t.rotation))
+    val a = {
+        for(t <- everything) yield {
+          t.position
+        }
     }
     vbo.updateVertices(a.toArray)
   }
 }
 
-trait TriangleBatch extends VectorBatch {
+trait ShapeBatch extends VectorBatch[Position2D with Rotation] {
+
+  def shape:Array[vec2]
+
+  override def update() {
+    val a = {
+        for (t <- everything; s <- shape) yield {
+          (t.position + s.rotate(t.rotation))
+        }
+    }
+    vbo.updateVertices(a.toArray)
+  }
+}
+
+trait TriangleBatch extends ShapeBatch {
   val drawMode = GL11.GL_TRIANGLES
 }
 
-trait SpriteBatch extends RenderBatch {
+trait SpriteBatch extends RenderBatch[Position2D with Rotation] {
 
 //  def numAllocated:Int
   def imageResource:Resource[Image]
