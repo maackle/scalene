@@ -14,7 +14,7 @@ object TheSwifts extends ScaleneApp with ScaleneAppDebug {
   val windowSize = Some(1000,1000)
   val windowTitle = "The Swifts"
 
-  lazy val startState = new states.MenuState
+  lazy val startState = new states.PlayState
 
   val debugColor = Color.black
 }

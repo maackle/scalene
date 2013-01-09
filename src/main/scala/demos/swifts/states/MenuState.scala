@@ -2,7 +2,7 @@ package demos.swifts.states
 
 import demos.swifts.TheSwifts
 import demos.swifts.things.{Hawk, SwiftSwarm}
-import scalene.components.{Acceleration2D, Position2D, PositionXY, CircleShape}
+import scalene.components._
 import scalene.core._
 import scalene.event.{EventHandler, KeyDownEvent, EventSink, HandyHandlers}
 import scalene.gfx.{VectorBatch, Sprite, TTF, Color}
@@ -11,6 +11,7 @@ import scalene.core.traits.{Render, Update}
 import scalene.event.KeyDownEvent
 import org.lwjgl.opengl.GL11
 import collection.mutable.ArrayBuffer
+import scalene.event.KeyDownEvent
 
 trait Menu extends Render with Update with EventSink {
 
@@ -33,7 +34,7 @@ trait Menu extends Render with Update with EventSink {
   }
 }
 
-trait Particle extends Acceleration2D {
+trait Particle extends Verlet2D {
   val color:Color
 }
 
@@ -47,7 +48,7 @@ trait PointParticleSystem extends VectorBatch[Particle] {
   var vecbuf = ArrayBuffer[vec2]()
   var colorbuf = ArrayBuffer[Color]()
 
-  override def update() {
+  override def update(dt:Float) {
 
     vecbuf.clear()
     colorbuf.clear()
@@ -78,7 +79,7 @@ class CloudSystem extends PointParticleSystem {
     val acceleration = vec(0, 90f) + vec.polar.random(90)
     val color = Color.white.alpha(0.5f)
 
-    def simulate(dt:Float) {
+    def update(dt:Float) {
       color.a -= 0.0001f
       color.r -= 0.0001f
       if(color.a < 0) color.a = 0
@@ -93,7 +94,7 @@ class MenuState extends State(TheSwifts) with HandyHandlers {
 
   val school = new Sprite(Resource.Image("img/hawks/school-low-contrast.png"), vec(0,0))
   val menu = new Menu {
-    def update() {}
+    def update(dt:Float) {}
 
     def items = IndexedSeq(
       "Start" -> (()=>{ 'go }),

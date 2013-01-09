@@ -6,5 +6,5 @@ object Tomboy extends ScaleneApp {
   val windowSize = Some(600,600)
   val windowTitle = "Tomboy"
 
-  lazy val startState = new states.Tomboy.PlayTomboy()
+  lazy val startState = new states.TomboyDomain.PlayTomboy()
 }

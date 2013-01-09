@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11
 import scalene.vector.{vec2, vec}
 import scalene.event.HandyHandlers
 import scalene.components.CircleShape
+import scalene.core.traits.Render
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,12 +23,12 @@ class PlayState extends State(TheSwifts) with HandyHandlers {
 
   val swarm = new SwiftSwarm(1000, hawk)
 
-  val chimney = new CircleShape {
+  val chimney = new CircleShape with Render {
     def position: vec2 = vec2.zero
     def radius = 20
-    override def render() {
+    def render() {
       Color.green.bind()
-      super.render()
+      draw()
     }
   }
 

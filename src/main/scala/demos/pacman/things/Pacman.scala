@@ -26,11 +26,9 @@ class Pacman(val position:vec2)
 
   val handler = EventHandler.bindvec(velocity, 100, false)(KEY_UP, KEY_LEFT, KEY_DOWN, KEY_RIGHT)
 
-  def update() {
+  def update(dt:Float) {
     if(velocity.nonZero) rotation = velocity.angle
   }
-
-  def simulate(dt:Float) = ()
 
   def render() {
     val N = 16

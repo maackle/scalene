@@ -1,17 +1,18 @@
 package demos.tomboy.states
 
 import scalene.gfx._
-import scalene.components.Acceleration2D
+import scalene.components.{Verlet2D, Acceleration2D}
 import scalene.common
 import scalene.vector.{vec, vec2}
 import scalene.event._
 import scalene.input.LWJGLKeyboard
 import scalene.core.{View2D, Domain, State}
 import scalene.event.KeyDownEvent
-import scalene.core.traits.{ScaleneMixin, Simulate, Render}
+import scalene.core.traits.{Update, ScaleneMixin, Render}
 import scalene.audio.SoundStore
+import demos.tomboy.Tomboy
 
-object Tomboy extends Domain(null) {
+object TomboyDomain extends Domain(Tomboy) {
 
   lazy val game = app
 
@@ -48,7 +49,7 @@ object Tomboy extends Domain(null) {
     }
   }
 
-  trait Lasery extends Simulate {
+  trait Lasery {
 
   }
 
@@ -63,10 +64,10 @@ object Tomboy extends Domain(null) {
 
   case class Boy(side:Boy.Side.Value, color:Color)(keyUp:Int, keyFire:Int)
   extends Render
-  with Lasery
+  with Update
   with EventSink
   with LWJGLKeyboard
-  with Acceleration2D {
+  with Verlet2D {
 
     val (w,h) = (32,32)
     var offset:vec2 = vec2.zero
@@ -84,7 +85,7 @@ object Tomboy extends Domain(null) {
       draw.rect(offset + position, w, h)
     }
 
-    override def simulate(dt:common.Real) {
+    def update(dt:common.Real) {
       val arenaHeight = Arena.size._2
       velocity = velocity.limit(terminalSpeed)
       if(position.y-h/2 < -arenaHeight/2) {
@@ -107,17 +108,17 @@ object Tomboy extends Domain(null) {
 
   }
 
-  class PlayTomboy extends State(Tomboy) with HandyHandlers {
+  class PlayTomboy extends State(TomboyDomain) with HandyHandlers {
 
-    def simulate(dt:common.Real) = {
-      boys.foreach{ b =>
-
-      }
-    }
+//    def simulate(dt:common.Real) = {
+//      boys.foreach{ b =>
+//
+//      }
+//    }
 
     import Boy._
 
-    val arenaSize = app.currentWindowSize
+    lazy val arenaSize = app.currentWindowSize
 
     val boys:List[Boy] =
       Boy(Side.Left, colorLeft)(KEY_Z, KEY_X) ::
@@ -130,13 +131,13 @@ object Tomboy extends Domain(null) {
 
     this ++= boys
 
-    val handler = (
-      zoomer(view, 0.99f)(KEY_MINUS, KEY_EQUALS)
-      ++ panner(view, 4)(KEY_W, KEY_A, KEY_S, KEY_D)
-    )
-
     val view = View2D.simple(Color(0xC7E2C3), drawables)
     //Color(0xC7E2C3)
+
+    val handler = (
+      zoomer(view, 0.99f)(KEY_MINUS, KEY_EQUALS)
+        ++ panner(view, 4)(KEY_W, KEY_A, KEY_S, KEY_D)
+      )
   }
 
 

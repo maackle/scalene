@@ -59,7 +59,7 @@ class KeyEventSource extends EventSource[KeyEvent] {
   private val keyState = collection.mutable.Map[Event.Id, MemBoolean]()
   private val downKeys = collection.mutable.Set[Event.Id]()
 
-  def update() {
+  def update(dt:Float) {
 
     eventQueue.clear()
 
@@ -82,7 +82,7 @@ class KeyEventSource extends EventSource[KeyEvent] {
 
 class MouseEventSource extends EventSource[MouseEvent] {
 
-  def update() = ???
+  def update(dt:Float) = ???
 
 }
 

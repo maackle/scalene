@@ -1,7 +1,7 @@
 package scalene.gfx.particles
 
 import scalene.common._
-import scalene.components.{Position2D, Acceleration2D}
+import scalene.components.{Verlet2D, Position2D, Acceleration2D}
 import scalene.core.traits.{Update, Render}
 import scalene.vector.vec2
 
@@ -13,7 +13,7 @@ trait ParticleSystem extends Update with Render with Position2D {
   def emitters:Traversable[Emitter]
   def particles:Traversable[Particle]
 
-  def update() {
+  def update(dt:Float) {
     emitters.map { emitter =>
       emitter.__update()
     }
@@ -39,6 +39,6 @@ trait Emitter {
 
 }
 
-class Particle(var position:vec2, var velocity:vec2, var acceleration:vec2) extends Acceleration2D {
-  override def simulate(dt:Real) { !!! }
+class Particle(var position:vec2, var velocity:vec2, var acceleration:vec2) extends Verlet2D {
+  override def update(dt:Real) { !!! }
 }

@@ -3,20 +3,26 @@ package scalene.components
 import scalene.vector._
 import scalene.common
 import common.???
-import scalene.core.traits.{Render, Component, Simulate, ScaleneMixin}
+import scalene.core.traits._
 import scalene.gfx.draw
 
 trait Position extends Component { def position: vec }
 trait Position2D extends Component {
   def position: vec2
 }
-trait PositionXY extends Position2D {
-  def x = position.x
-  def y = position.y
-  def x_=(v:common.Real) { position.x = v}
-  def y_=(v:common.Real) { position.y = v}
-}
 
+trait PositionXY extends Position2D {
+  def x: common.Real
+  def y: common.Real
+  def x_=(x:common.Real)
+  def y_=(y:common.Real)
+//  var x, y : common.Real
+  def position = vec(x,y)
+  def position_=(v:vec2) {
+    x = v.x
+    y = v.y
+  }
+}
 
 trait Rotation {
   def rotation: Radian
@@ -26,22 +32,22 @@ trait Scaling2D {
   def scale: vec2
 }
 
-
 trait Velocity extends Component { def velocity: vec }
-trait Velocity2D extends Component with Position2D with Simulate {
+trait Velocity2D extends Component with Position2D {
   def velocity: vec2
-  abstract override def __simulate(dt:common.Real) {
-    position += velocity * dt
-    super.__simulate(dt)
-  }
 }
 
 trait Acceleration extends Component { def acceleration: vec }
 trait Acceleration2D extends Component with Velocity2D {
   def acceleration: vec2
-  abstract override def __simulate(dt:common.Real) {
+}
+
+trait Verlet2D extends Acceleration2D with Update {
+
+  override def __update(dt:common.Real) {
+    super.__update(dt)
+    position += velocity * dt
     velocity += acceleration * dt
-    super.__simulate(dt)
   }
 }
 
@@ -49,7 +55,7 @@ trait Acceleration2D extends Component with Velocity2D {
 //  def hitTest(other:Shape):Boolean
 //  def hitTest(point:vec):Boolean
 //}
-trait Shape2D extends Position2D with Render {
+trait Shape2D extends Position2D {
   def hitTest(other:Shape2D):Boolean
   def hitTest(other:vec2):Boolean
 }
@@ -70,16 +76,24 @@ trait CircleShape extends Shape2D {
       ???
   }
 
-  def render() {
-    draw.circle(radius)
+  def draw() {
+    scalene.gfx.draw.circle(radius)
   }
 }
 
-trait PolygonShape extends Shape2D {
-
+trait ConvexPolygonShape extends Shape2D {
+  def vertices:Seq[vec2] = ???
 }
 
-trait RectangleShape extends PolygonShape {
+object RectangleShape {
+  def apply(a:vec2, b:vec2) = new RectangleShape {
+    val position = (a + b) / 2
+    val width = math.abs(a.x - b.x)
+    val height = math.abs(a.y - b.y)
+  }
+}
+
+trait RectangleShape extends ConvexPolygonShape {
 
   def width:common.Real
   def height:common.Real
@@ -120,7 +134,7 @@ trait RectangleShape extends PolygonShape {
     }
   }
 
-  def render() {
+  def draw() {
     scalene.gfx.draw.rect(width, height)
   }
 }

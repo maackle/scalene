@@ -22,12 +22,13 @@ trait ScaleneAppDebug extends ScaleneApp {
 
   def avgFPS:Double
   def debugColor:Color
+  def extraDebugText:String = ""
 
   override def loopBody() {
     super.loopBody()
     GLSettings.viewHUD()
     font.drawString(
-      "fps: %d (%4.1f ms)".format(avgFPS.round.toInt, avgExecutionTime),
+      "fps: %d (%4.1f ms)\n%s".format(avgFPS.round.toInt, avgExecutionTime, extraDebugText),
       vec(5, currentWindowSize._2 - 5),
       debugColor,
       vec(-1,-1)
@@ -44,6 +45,7 @@ with Initialize {
   val startState:State
   def currentState:State = stateMachine.current
   val fps = 60
+  val dt = 1 / fps.toFloat
   val vsync = true
   lazy val msecsStartup = milliseconds
   def fullscreen = windowSize.isEmpty
@@ -125,8 +127,8 @@ with Initialize {
   }
 
   def loopBody() {
-    currentState.__update()
-    _eventSources.foreach(_.__update())
+    currentState.__update(dt)
+    _eventSources.foreach(_.__update(dt))
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()

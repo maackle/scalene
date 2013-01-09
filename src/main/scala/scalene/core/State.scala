@@ -16,10 +16,10 @@ abstract class ScaleneSketch
   with EventSink
   with LWJGLKeyboard
 
-trait StateEventHandling extends ThingStore[Hook] {
+trait StateEventHandling extends ThingStore[Any] {
 
-  abstract override def __update() {
-    super.__update()
+  abstract override def __update(dt:Float) {
+    super.__update(dt)
     val sinks = (everything ++ Traversable(this)) flatMap {
       case s:EventSink => Some(s)
       case _ => None
@@ -34,7 +34,7 @@ trait StateEventHandling extends ThingStore[Hook] {
   }
 }
 
-trait StateMixin extends ScaleneApp with ThingStore[Hook] with StateEventHandling with Render { self =>
+trait StateMixin extends ScaleneApp with ThingStore[Any] with StateEventHandling with Render { self =>
 
   def app = this
   val view:View2D
@@ -50,14 +50,14 @@ trait StateMixin extends ScaleneApp with ThingStore[Hook] with StateEventHandlin
 
 }
 
-abstract class State(val app:ScaleneApp) extends HashedThingStore[Hook] with StateEventHandling with Render {
+abstract class State(val app:ScaleneApp) extends HashedThingStore[Any] with StateEventHandling with Render {
   def this(domain:Domain) = this(domain.app)
   val view:View2D
 
   protected def onEnter(bloc: =>Unit) {}
   protected def onExit(bloc: =>Unit) {}
 
-  def update() { /* typically handled by ThingStore */ }
+  def update(dt:Float) { /* typically handled by ThingStore */ }
   def render() {
     if(view!=null) view.__render()
   }

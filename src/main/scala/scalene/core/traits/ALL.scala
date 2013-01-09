@@ -57,12 +57,12 @@ trait PreUpdate extends Hook {
 }
 
 trait Update extends Hook {
-  def update()
-  def __update() = update()
+  def update(dt:Real)
+  def __update(dt:Real) = { update(dt) }
 }
 
-trait Simulate extends Hook {
-  def simulate(dt:Real)
-  def __simulate(dt:Real) = simulate(dt)
-}
-
+//trait Simulate extends Hook {
+//  def simulate(dt:Real)
+//  def __simulate(dt:Real) = simulate(dt)
+//}
+//

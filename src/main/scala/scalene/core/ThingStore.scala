@@ -3,10 +3,11 @@ package scalene.core
 import scalene.event.EventSink
 import traits._
 import scala.Some
+import scalene.physics.Physical
 
 trait IndexedThingStore[M] extends ThingStore[M] {
+
   protected var __things = collection.mutable.IndexedSeq[M]()
-//  override def everything:IndexedSeq[M] = __things
 
   protected def += (t:M) { assert(t!=this); __things ++ Seq(t) }
   protected def ++= (t:Seq[M]) { assert(t!=this); __things ++= t }
@@ -14,12 +15,13 @@ trait IndexedThingStore[M] extends ThingStore[M] {
 
 trait HashedThingStore[M] extends ThingStore[M] {
 
+  protected var __things = collection.mutable.Set[M]()
+
   protected def += (t:M) { assert(t!=this); __things += t }
   protected def ++= (t:Seq[M]) { assert(t!=this); __things ++= t }
   protected def -= (t:M) { assert(t!=this); __things -= t }
   protected def --= (t:Seq[M]) { assert(t!=this); __things --= t }
 
-  protected var __things = collection.mutable.Set[M]()
 }
 
 trait ThingStore[M] extends Update {
@@ -32,13 +34,14 @@ trait ThingStore[M] extends Update {
 //    }
 //  }
 
-  abstract override def __update() {
+  abstract override def __update(dt:Float) {
 
-    super.__update()
+    super.__update(dt)
 
     for (t <- everything) {
-      if (t.isInstanceOf[Update]) t.asInstanceOf[Update].__update()
-      if (t.isInstanceOf[Simulate]) t.asInstanceOf[Simulate].__simulate(1 / app.fps.toFloat)
+      if (t.isInstanceOf[Update]) {
+        t.asInstanceOf[Update].__update(app.dt)
+      }
     }
   }
 

@@ -60,7 +60,7 @@ class SpriteAnimation(var position:vec2, f:(Resource[Image], FrameOptions)*) ext
   def play() { advance = true }
   def pause() { advance = false }
 
-  def update() {
+  def update(dt:Float) {
     if(advance && millis - lastAdvance > frame.durationMs) {
       mode match {
         case Mode.Once => if(currentIndex < numFrames - 1) currentIndex += 1

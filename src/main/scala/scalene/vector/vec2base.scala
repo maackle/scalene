@@ -1,11 +1,14 @@
 package scalene.vector
 
 import math._
-
-trait vec2base[@specialized(Float, Double) V] extends vec {
+//[@specialized(Float, Double) V]
+trait vec2base extends vec {
 
 //  val fractOps = implicitly[Fractional[V]]
 //  import fractOps._
+
+  type V = Float
+
   var x : V
   var y : V
 
@@ -37,10 +40,10 @@ trait vec2base[@specialized(Float, Double) V] extends vec {
   def flipX:vec2
   def flipY:vec2
 
-  def +(v:vec2):vec2
-  def -(v:vec2):vec2
+  def +(v:vec2base):vec2
+  def -(v:vec2base):vec2
   def *(c:V):vec2
-  def *(v:vec2):vec2
+  def *(v:vec2base):vec2
   def /(c:V):vec2
 
   @inline

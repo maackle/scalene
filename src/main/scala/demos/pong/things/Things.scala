@@ -9,6 +9,8 @@ import scalene.gfx.{AutoTransformer2D, Color, draw}
 import scalene.event.KeyHoldEvent
 import scalene.common
 import common._
+import scalene.physics.Physical
+import org.jbox2d.dynamics.{BodyType, BodyDef}
 
 object Arena {
 
@@ -29,6 +31,25 @@ class Arena(val width:Real, val height:Real) {
     }
   }
 
+  case class Wall(a:vec2, b:vec2) extends Physical with RectangleShape {
+    val (initialPosition, width, height) = {
+      val shape = RectangleShape(a,b)
+      (shape.position, shape.width, shape.height)
+    }
+
+    override val setupBody = { body:BodyDef => {
+        body.`type` = BodyType.STATIC
+      }
+    }
+  }
+
+  val walls = List(
+    Wall(vec(-width/2, -height/2), vec(-width, +height/2)),
+    Wall(vec(+width/2, -height/2), vec(+width, +height/2)),
+    Wall(vec(-width/2, -height/2), vec(+width/2, -height)),
+    Wall(vec(-width/2, +height/2), vec(+width/2, +height))
+  )
+
 }
 
 object Paddle {
@@ -36,18 +57,19 @@ object Paddle {
 }
 
 class Paddle(arena:Arena, side:Arena.Side, controls:Paddle.Controls)
-  extends Velocity2D
+  extends Physical
+  with Render
   with RectangleShape
   with AutoTransformer2D
   with EventSink {
 
-  val speed = 400
-  val thickness = 10f
+  val speed = 50
+  val thickness = 1f
   val width = thickness
-  var height = 50.0f
-  val position = vec(arena.paddleX(side), 0f)
-  val velocity = vec2.zero
-  val rotation = 0.0
+  var height = 5f
+  val initialPosition = vec(arena.paddleX(side), 0f)
+//  val velocity = vec2.zero
+//  val rotation = 0.0
   val scale = vec2.one
 
   val handler = EventHandler {
@@ -59,30 +81,33 @@ class Paddle(arena:Arena, side:Arena.Side, controls:Paddle.Controls)
       velocity.y = 0
   }
 
+  override val setupBody = { body:BodyDef => {
+      body.`type` = BodyType.KINEMATIC
+    }
+  }
+
+
   def simulate(dt:Float) = ()
 
-  override def render() {
+  def render() {
     Color.white.bind()
-    draw.rect(thickness, height)
+    draw()
   }
 
 }
 
 class Ball(direction:Arena.Side)
-  extends Velocity2D
+  extends Physical
   with RectangleShape
   with AutoTransformer2D {
 
   private val initialSpreadAngle = math.Pi/2 // 90 degrees
-  val radius = 4.0f
+  val radius = 1f
   val height, width = radius
 
-  val position = vec2.zero
   val scale = vec2.one
-  val rotation = 0.0
-  def velocity = vec.polar(speed, angle)
 
-  var speed = 100
+  var speed = 50
   var angle = {
     val center = direction match {
       case Side.Left => math.Pi
@@ -92,10 +117,18 @@ class Ball(direction:Arena.Side)
     maackle.util.Random.uniform(center - spread, center + spread)
   }
 
-  def simulate(dt:Float) = ()
+  val initialPosition = vec2.zero
+  override val initialVelocity = vec.polar(speed, angle)
+
+  def update(dt:Float) = ()
+
+  override val setupBody = { body:BodyDef =>
+    body.angularDamping = 0.5f
+
+  }
 
   override def render() {
     Color.white.bind()
-    draw.circle(radius)
+    draw()
   }
 }

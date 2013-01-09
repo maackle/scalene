@@ -1,6 +1,6 @@
 package demos.secondhand.things
 
-import scalene.components.Acceleration2D
+import scalene.components.{Verlet2D, Acceleration2D}
 import scalene.core.traits.{Update, Render}
 import scalene.vector.vec2
 import scalene.event._
@@ -11,7 +11,7 @@ import scalene.core.Resource
 
 abstract class Ship
   extends Spritely
-  with Acceleration2D
+  with Verlet2D
 
 object Hero {
   val accel = 1000.0f
@@ -30,7 +30,7 @@ class Hero(var position:vec2) extends Ship with EventSink with HandyHandlers {
     mover(acceleration, accel)(KEY_UP, KEY_LEFT, KEY_DOWN, KEY_RIGHT)
   )
 
-  def simulate(dt:Real) = {
+  def update(dt:Real) = {
     velocity *= (1 - friction * dt)
   }
 

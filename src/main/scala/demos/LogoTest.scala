@@ -55,7 +55,7 @@ class LogoTest extends /*State() with*/ EventSink {
     var scale = vec(10,10)
 //    def translate = position
 
-    def update() {}
+    def update(dt:Float) {}
 
     def render() {
       GL11.glPointSize(2f)

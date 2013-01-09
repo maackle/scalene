@@ -3,7 +3,7 @@ package demos.swifts.things
 import scalene.gfx.{Image, Sprite}
 import scalene.core.Resource
 import scalene.vector.{vec2, vec}
-import scalene.components.{Acceleration2D, Rotation}
+import scalene.components.{Verlet2D, Acceleration2D, Rotation}
 import scalene.event.HandyHandlers
 
 /**
@@ -15,18 +15,21 @@ import scalene.event.HandyHandlers
  */
 
 
-trait Birdy extends Acceleration2D with Rotation {
+trait Birdy extends Verlet2D with Rotation {
 
+}
+
+object Hawk {
+  val maxVelocity = 280f
 }
 
 class Hawk extends Sprite(Resource[Image]("img/hawks/1-64.png")(Image.load), vec(0,0))
 with Birdy
 with HandyHandlers {
-
+  import Hawk._
   var velocity, acceleration = vec2.zero
-  val maxVelocity = 280f
 
-  def simulate(dt:Float) {
+  def update(dt:Float) {
     rotation = velocity.angle
     velocity = velocity.limit(maxVelocity)
   }
