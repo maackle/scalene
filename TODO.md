@@ -1,13 +1,33 @@
 TODO
-====
+----
 
-### create SpriteSwarm class 
-has its own huge VBO (stream-style), each Sprite (or whatever we call it) member has a position_= function that either: 
-- updates a swarm-wide array of positions, and when the swarm is rendered it uploads the entire array
-- on swarm render we loop through all members and construct a new buffer to upload 
-will probably want this for particle effects
+- finish animation
+- work on state transitions
+    - make some menu screens
 
-# DT = 1 / FPS
+To be implemented
+-----------------
 
-# wtf colors wtf
-# wtf acceleration wtf
+## Graphics
+
+- animation
+- sprite atlas
+
+## Physics
+
+- joints
+- contact listeners
+- more general traits to help with multi-fixture bodies and multi-body objects
+    - concave polygon triangulation
+
+## Input
+
+- Mouse
+    - Composite events (double click, drag)
+- Gamepad
+
+## Other
+
+## Wish list
+
+
