@@ -9,7 +9,7 @@ import traits.{Hook, Update}
  * Time: 10:48 AM
  * To change this template use File | Settings | File Templates.
  */
-abstract class Domain(val app:ScaleneApp) extends HashedThingStore[Any] with Update {
+abstract class Domain(val app:ScaleneApp) extends HashedThingStore with Update {
 
   def update(dt:Float) = ()
   def currentState:State = app.currentState

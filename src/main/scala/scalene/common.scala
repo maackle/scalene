@@ -10,13 +10,21 @@ package object common {
   type Real = Float
   type Radian = Double
 
+  val NOOP = () => {}
+  def NOOP1[T] = (t:T) => {}
+  def NOOP2[T, U] = (t:T, u:U) => {}
+
   private var __onetimer = collection.mutable.Set[Op]()
 
   private def _milliseconds = ((Sys.getTime * 1000) / Sys.getTimerResolution)
-  private lazy val _milliseconds0 = _milliseconds
-  def milliseconds: Double = {
-    _milliseconds - _milliseconds0
+
+  private lazy val ms0 = System.currentTimeMillis()
+
+  def milliseconds: Long = {
+    (System.currentTimeMillis() - ms0)
   }
+
+  def seconds: Float = milliseconds / 1000f
 
   object implicits {
     implicit def block2Fn(bloc: =>Any) = ()=>{bloc}

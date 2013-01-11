@@ -50,7 +50,7 @@ trait StateMixin extends ScaleneApp with ThingStore[Any] with StateEventHandling
 
 }
 
-abstract class State(val app:ScaleneApp) extends HashedThingStore[Any] with StateEventHandling with Render {
+abstract class State(val app:ScaleneApp) extends HashedThingStore with StateEventHandling with Render {
   def this(domain:Domain) = this(domain.app)
   val view:View2D
 

@@ -11,6 +11,7 @@ import scalene.common
 import common._
 import scalene.physics.Physical
 import org.jbox2d.dynamics.{BodyType, BodyDef}
+import org.jbox2d.collision.shapes.MassData
 
 object Arena {
 
@@ -37,10 +38,7 @@ class Arena(val width:Real, val height:Real) {
       (shape.position, shape.width, shape.height)
     }
 
-    override val setupBody = { body:BodyDef => {
-        body.`type` = BodyType.STATIC
-      }
-    }
+    setupBodyDef(_.`type` = BodyType.STATIC)
   }
 
   val walls = List(
@@ -53,41 +51,52 @@ class Arena(val width:Real, val height:Real) {
 }
 
 object Paddle {
-  case class Controls(upKey:Int, downKey:Int)
+  case class Controls(upKey:Int, downKey:Int, leftKey:Int, rightKey:Int)
 }
 
 class Paddle(arena:Arena, side:Arena.Side, controls:Paddle.Controls)
   extends Physical
+  with Update
   with Render
   with RectangleShape
   with AutoTransformer2D
   with EventSink {
 
-  val speed = 50
   val thickness = 1f
   val width = thickness
   var height = 5f
   val initialPosition = vec(arena.paddleX(side), 0f)
-//  val velocity = vec2.zero
-//  val rotation = 0.0
   val scale = vec2.one
 
-  val handler = EventHandler {
-    case KeyHoldEvent(controls.upKey) =>
-      velocity.y = +speed
-    case KeyHoldEvent(controls.downKey) =>
-      velocity.y = -speed
-    case KeyUpEvent(controls.upKey) | KeyUpEvent(controls.downKey) =>
-      velocity.y = 0
-  }
-
-  override val setupBody = { body:BodyDef => {
-      body.`type` = BodyType.KINEMATIC
+  val handler = {
+    def go(x:Float, y:Float) = { body.applyForce(vec(x,y).unit * 100000f, body.getPosition) }
+    EventHandler {
+      case KeyHoldEvent(controls.upKey) => go(0, 1)
+      case KeyHoldEvent(controls.downKey) => go(0, -1)
+      case KeyHoldEvent(controls.leftKey) => go(-1, 0)
+      case KeyHoldEvent(controls.rightKey) => go(1, 0)
+//      case KeyUpEvent(controls.upKey) | KeyUpEvent(controls.downKey) =>
+//        velocity.y = 0
     }
   }
 
+  setup(
+    bodydef = b => {
+      b.`type` = BodyType.DYNAMIC
+    },
+    fixturedef = f => {
+      f.restitution = 0.5f
+      f.density = 10f
+    },
+    body = b => {
+      b.setFixedRotation(false)
+    }
+  )
 
-  def simulate(dt:Float) = ()
+  def update(dt:Float) = {
+    body.limitLinearVelocity(30f)
+    body.limitAngularVelocity(math.Pi.toFloat / 4)
+  }
 
   def render() {
     Color.white.bind()
@@ -98,6 +107,7 @@ class Paddle(arena:Arena, side:Arena.Side, controls:Paddle.Controls)
 
 class Ball(direction:Arena.Side)
   extends Physical
+  with Update
   with RectangleShape
   with AutoTransformer2D {
 
@@ -107,7 +117,7 @@ class Ball(direction:Arena.Side)
 
   val scale = vec2.one
 
-  var speed = 50
+  var speed = 50f
   var angle = {
     val center = direction match {
       case Side.Left => math.Pi
@@ -120,14 +130,26 @@ class Ball(direction:Arena.Side)
   val initialPosition = vec2.zero
   override val initialVelocity = vec.polar(speed, angle)
 
-  def update(dt:Float) = ()
+  setup(
+    bodydef = b => {
+      b.bullet = true
+    },
+    fixturedef = f => {
+      f.density = 1f
+    },
+    body = b => {
+      b.setFixedRotation(true)
+    }
+  )
 
-  override val setupBody = { body:BodyDef =>
-    body.angularDamping = 0.5f
+  var dScale = 100f
 
+  def update(dt:Float) {
+    body.limitLinearVelocity(40f)
+    body.limitAngularVelocity(math.Pi.toFloat / 2)
   }
 
-  override def render() {
+  def render() {
     Color.white.bind()
     draw()
   }

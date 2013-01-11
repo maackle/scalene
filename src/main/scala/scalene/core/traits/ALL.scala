@@ -34,7 +34,7 @@ trait ID {
 
 trait Execute {
   def execute()
-  def __execute() = execute()
+  private[scalene] def __execute() = execute()
 }
 
 trait Initialize {
@@ -48,17 +48,17 @@ trait Initialize {
 
 trait Render extends Hook {
   def render()
-  def __render() = render()
+  private[scalene] def __render() = render()
 }
 
 trait PreUpdate extends Hook {
   def preupdate()
-  def __preupdate() = preupdate()
+  private[scalene] def __preupdate() = preupdate()
 }
 
 trait Update extends Hook {
   def update(dt:Real)
-  def __update(dt:Real) = { update(dt) }
+  private[scalene] def __update(dt:Real) = { update(dt) }
 }
 
 //trait Simulate extends Hook {

@@ -13,6 +13,7 @@ package object util {
 
   def getFile(path: String) = io.Source.fromInputStream(getStream(path))
 
+  // Must be Double!  If using float, subtract a very large number first
   def getMilliseconds: Double = {
     ((Sys.getTime * 1000) / Sys.getTimerResolution)
   }

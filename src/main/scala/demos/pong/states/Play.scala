@@ -11,7 +11,7 @@ import scalene.physics.Worldly
 import org.jbox2d.dynamics.World
 import scalene.vector.vec
 import org.jbox2d.dynamics
-import scalene.event.HandyHandlers
+import scalene.event.{KeyHoldEvent, KeyDownEvent, EventHandler, HandyHandlers}
 
 class Play extends State(Pong) with Worldly with HandyHandlers {
 
@@ -25,16 +25,22 @@ class Play extends State(Pong) with Worldly with HandyHandlers {
   }
 
   val paddles = Seq(
-    new Paddle(arena, Arena.Side.Left, Controls(KEY_W, KEY_S)),
-    new Paddle(arena, Arena.Side.Right, Controls(KEY_UP, KEY_DOWN))
+    new Paddle(arena, Arena.Side.Left, Controls(KEY_W, KEY_S, KEY_A, KEY_D)),
+    new Paddle(arena, Arena.Side.Right, Controls(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT))
   )
 
+  val ball = new Ball(Arena.Side.Left)
+
   this ++= paddles
-  this += new Ball(Arena.Side.Left)
+  this += ball
   this ++= arena.walls
 
   val view = View2D.simple(Color.gray, renderables.toSeq)
   view.zoom = math.sqrt(scale).toFloat
 
-  val handler = zoomer(view, 0.99f)(KEY_MINUS, KEY_EQUALS)
+  val handler = zoomer(view, 0.99f)(KEY_MINUS, KEY_EQUALS) ++ EventHandler {
+    case KeyHoldEvent(KEY_G) =>
+      ball.dScale *= 0.90f
+    case KeyHoldEvent(KEY_H) => ball.dScale /= 0.90f
+  }
 }

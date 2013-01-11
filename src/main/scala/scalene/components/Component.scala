@@ -44,7 +44,7 @@ trait Acceleration2D extends Component with Velocity2D {
 
 trait Verlet2D extends Acceleration2D with Update {
 
-  override def __update(dt:common.Real) {
+  private[scalene] override def __update(dt:common.Real) {
     super.__update(dt)
     position += velocity * dt
     velocity += acceleration * dt
