@@ -16,6 +16,10 @@ trait SubTexture extends Textured {
   lazy protected val (tw, th) = (clip.w / paddedWidth, clip.h / paddedHeight )
   lazy private val (tx0, ty0) = (clip.x / paddedWidth, clip.y / paddedHeight)
   lazy private val (tx1, ty1) = (tx0 + tw, ty0 + th)
+//  lazy private val (vx0, vy0) = (clip.x, clip.y)
+//  lazy private val (vx1, vy1) = (clip.x + clip.w, clip.y + clip.h)
+  lazy private val (vx0, vy0) = (0, 0)
+  lazy private val (vx1, vy1) = (clip.w, clip.h)
 
   lazy val texCoords = Array(
     vec(tx0, ty0),
@@ -24,10 +28,10 @@ trait SubTexture extends Textured {
     vec(tx0, ty1)
   ).reverse
   lazy val vertices = Array(
-    vec(0, 0),
-    vec(texWidth, 0),
-    vec(texWidth, texHeight),
-    vec(0, texHeight)
+    vec(vx0, vy0),
+    vec(vx1, vy0),
+    vec(vx1, vy1),
+    vec(vx0, vy1)
   )
 
   def blit(color:Color = Color.white) {
@@ -40,16 +44,16 @@ trait SubTexture extends Textured {
     def oldWay = {
       gl.begin(GL_TRIANGLE_FAN) {
         glTexCoord2f(tx0, ty1)
-        glVertex2f(0, 0)
+        glVertex2f(vx0, vy0)
 
         glTexCoord2f(tx1, ty1)
-        glVertex2f(texWidth, 0)
+        glVertex2f(vx1, vy0)
 
         glTexCoord2f(tx1, ty0)
-        glVertex2f(texWidth, texHeight)
+        glVertex2f(vx1, vy1)
 
         glTexCoord2f(tx0, ty0)
-        glVertex2f(0, texHeight)
+        glVertex2f(vx0, vy1)
       }
     }
   }

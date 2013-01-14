@@ -5,12 +5,13 @@ import demos.swifts.things.{Hawk, SwiftSwarm}
 import scalene.components._
 import scalene.core._
 import scalene.event.{EventHandler, KeyDownEvent, EventSink, HandyHandlers}
-import scalene.gfx.{VectorBatch, Sprite, TTF, Color}
+import scalene.gfx._
 import scalene.vector.{vec, vec2}
 import scalene.core.traits.{Render, Update}
 import scalene.event.KeyDownEvent
 import org.lwjgl.opengl.GL11
 import collection.mutable.ArrayBuffer
+import scalene.event.KeyDownEvent
 import scalene.event.KeyDownEvent
 
 trait Menu extends Render with Update with EventSink {
@@ -92,7 +93,7 @@ class CloudSystem extends PointParticleSystem {
 
 class MenuState extends State(TheSwifts) with HandyHandlers {
 
-  val school = new Sprite(Resource.Image("img/hawks/school-low-contrast.png"), vec(0,0))
+  val school = new Sprite(Image("img/hawks/school-low-contrast.png"), vec(0,0))
   val menu = new Menu {
     def update(dt:Float) {}
 

@@ -58,11 +58,10 @@ trait TriangleBatch extends ShapeBatch {
 trait SpriteBatch extends RenderBatch[Position2D with Rotation] {
 
 //  def numAllocated:Int
-  def imageResource:Resource[Image]
+  def image:Image
 
   // TODO: use single VBO for entire batch
   override def render() {
-    val image = imageResource.is
     everything.map { t =>
       val pos = t.position
       gl.matrix {

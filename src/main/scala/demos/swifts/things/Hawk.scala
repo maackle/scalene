@@ -23,7 +23,7 @@ object Hawk {
   val maxVelocity = 280f
 }
 
-class Hawk extends Sprite(Resource[Image]("img/hawks/1-64.png")(Image.load), vec(0,0))
+class Hawk extends Sprite(Image("img/hawks/1-64.png"), vec(0,0))
 with Birdy
 with HandyHandlers {
   import Hawk._

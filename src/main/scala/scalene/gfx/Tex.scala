@@ -1,8 +1,11 @@
 package scalene.gfx
 
-import org.newdawn.slick.opengl.{TextureImpl, Texture}
+import org.newdawn.slick.opengl.{TextureLoader, TextureImpl, Texture}
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL13
+import maackle.util._
+import java.io.{FileInputStream, File}
+import scalene.core.Resource
 
 //class Tex(val id:Int, image:BufferedImage) {
 //  val (getImageWidth, getImageHeight) = (image.getWidth, image.getHeight)
@@ -37,12 +40,37 @@ object Tex {
   def lastBound = TextureImpl.getLastBind
   def lastBound_=(t:Texture) { TextureImpl.bindByForce(t) }
 
+
+  def load(path:String) = {
+    val reg = """.*\.(.+?)$""".r
+    val reg(ext) = path
+    val texture = ext match {
+      case "png" | "gif" | "jpg" | "jpeg" => { TextureLoader.getTexture(ext, getStream(path)) }
+      case _ => throw new Exception("image format '%s' is not recognized".format(ext))
+    }
+    new Tex(texture)
+  }
+
+  //TODO: test!
+  def load(file:File) = {
+    assert(file.isFile)
+    val reg = """.*\.(.+?)$""".r
+    val path = file.getPath
+    val reg(ext) = path
+    val texture = ext match {
+      case "png" | "gif" | "jpg" | "jpeg" => { TextureLoader.getTexture(ext, new FileInputStream(file)) }
+      case _ => throw new Exception("image format '%s' is not recognized".format(ext))
+    }
+    new Tex(texture)
+  }
+
 //  private var lastBoundId = -1
 }
 
 
 trait Textured {
-  protected def tex:Tex
+  protected def texResource:Resource[Tex]
+  def tex = texResource.is
 
   def bindAnd(andThenDo: =>Unit) {
 //    glEnable(GL_TEXTURE_2D)

@@ -50,7 +50,7 @@ object View2D {
 
 //  def simple(clearColor:Color)(things:Render*):View2D = simple(clearColor, things)
   def simple(clearColor:Color, thing:Render):View2D = simple(clearColor, Seq(thing))
-  def simple(clearColor:Color, things:Seq[Render]):View2D = {
+  def simple(clearColor:Color, things:Traversable[Render]):View2D = {
     new View2D {
       val layers = (
         Layer2D(0, SolidBackground(clearColor)) ::
@@ -78,11 +78,11 @@ object View2D {
 
 object Layer2D {
   def apply(parallax:Real, thing:Render):Layer2D = apply(parallax, Seq(thing))
-  def apply(parallax:Real, things:Seq[Render]) = {
+  def apply(parallax:Real, things:Traversable[Render]) = {
     new Layer2D(things, parallax)
   }
   def apply(thing:Render):Layer2D = apply(Seq(thing))
-  def apply(things:Seq[Render]) = {
+  def apply(things:Traversable[Render]) = {
     new Layer2D(things, 1)
   }
 
@@ -94,7 +94,7 @@ object Layer2D {
 //  }
 
 }
-class Layer2D(protected val things:Seq[Render], val parallax:Real=1) extends Layer {
+class Layer2D(protected val things:Traversable[Render], val parallax:Real=1) extends Layer {
   val __transform = Transform {
     if(parallax!=1)
       gl.scale(vec(parallax, parallax))
@@ -140,7 +140,7 @@ trait View2D extends View { view =>
 ///////////////////////////
 
 trait Layer extends Render with InternalTransform {
-  protected def things:Seq[Render]
+  protected def things:Traversable[Render]
   def render() {
     things foreach (_.__render())
   }

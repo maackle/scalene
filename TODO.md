@@ -5,9 +5,6 @@ TODO
 - work on state transitions
     - make some menu screens
 
-To be implemented
------------------
-
 ## Graphics
 
 - animation

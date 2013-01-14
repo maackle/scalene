@@ -3,12 +3,14 @@ package scalene.core
 import scalene.common
 import grizzled.slf4j.{Logging, Logger}
 import scala.None
+import scalene.gfx.{Tex, ImageLike, Image}
 
 trait Resource[O] {
   def locator: Resource.Locator
 //  def fn: (I) => O
-  def is:O
-  def load()
+//  def is:O
+//  def load()
+  protected def loadFn: Resource.Locator => O
 
   override def equals(o:Any) = {
     o match {
@@ -17,14 +19,40 @@ trait Resource[O] {
     }
   }
 
+  def map[A](fn:(O=>A)) = {
+    Resource(locator)(loc => {
+      fn(loadFn(loc))
+    })
+  }
+
+  private var x:O = _
+  private var isLoaded = false
+  def is:O = {
+    if(!isLoaded) {
+      Logger("Resource").error("Bad Resource access")
+      throw new Exception("Bad Resource access")
+    }
+    require(isLoaded, "attempted to access resource before it was loaded")
+    assume(x != null)
+    x
+  }
+  def map = common.???
+  def load() {
+    x = loadFn(locator)
+    isLoaded = true
+  }
+  override def toString = "Resource(%s)".format(locator)
 }
 
-object Resource extends Logging {
+//trait ImageResource extends Resource[Image] with ImageLike {
+//  def tex = is.tex
+//  def clip = is.clip
+//  def width = is.width
+//  def height = is.height
+//  def render() { is.render() }
+//}
 
-  object Image {
-    import scalene.gfx.{Image=>Im}
-    def apply(locator:Locator) = Resource(locator)(Im.load)
-  }
+object Resource extends Logging {
 
   type Locator = String
   private val needsLoading = collection.mutable.Set[Resource[_]]()
@@ -39,11 +67,11 @@ object Resource extends Logging {
   def tryAutoload(res:Resource[_]) {
     if(autoload_?) {
       res.load()
-      debug("resource %s loaded immediately" format res.locator)
+      info("resource %s loaded immediately" format res.locator)
     }
     else {
       needsLoading += res
-      debug("resource %s ready to be loaded" format res.locator)
+      info("resource %s ready to be loaded" format res.locator)
     }
   }
 
@@ -54,7 +82,10 @@ object Resource extends Logging {
         warn("resource already registered: " + locator)
         res.asInstanceOf[Resource[O]]
       case None =>
-        val res = new ResourceImpl[O](locator, fn)
+        val vs = (locator, fn)
+        val res = new Resource[O] {
+          val (locator, loadFn) = vs
+        }
         registered += locator -> res
         res
     }
@@ -62,6 +93,14 @@ object Resource extends Logging {
 
 //  def apply[T](path: String)(fn: (InputStream) => T) { apply(getStream(path))(fn) }
 //  def apply[O](path:String)(fn: Locator[String] => O)
+
+//  protected def make[O, R <: Resource[O]](locator: Locator)(fn: (Locator) => O):R = {
+//
+//    val res = lookup(locator)(fn)
+//    info("creating resource: " + res.locator)
+//    tryAutoload(res)
+//    res
+//  }
 
   def apply[O](locator: Locator)(fn: (Locator) => O):Resource[O] = {
     val res = lookup(locator)(fn)
@@ -77,25 +116,24 @@ object Resource extends Logging {
     }
   }
 
-  class ResourceImpl[O](val locator: Locator, fn: (Locator) => O) extends Resource[O] with Logging {
-    private var x:O = _
-    private var isLoaded = false
-    def is:O = {
-      if(!isLoaded) {
-        Logger("Resource").error("Bad Resource access")
-        throw new Exception("Bad Resource access")
-      }
-      require(isLoaded, "attempted to access resource before it was loaded")
-      assume(x != null)
-      x
-    }
-    def map = common.???
-    def load() {
-
-      x = fn(locator)
-      isLoaded = true
-    }
-    override def toString = "Resource(%s)".format(locator)
-  }
+//  class ResourceImpl[O](val locator: Locator, protected val loadFn: (Locator) => O) extends Resource[O] with Logging {
+//    private var x:O = _
+//    private var isLoaded = false
+//    def is:O = {
+//      if(!isLoaded) {
+//        Logger("Resource").error("Bad Resource access")
+//        throw new Exception("Bad Resource access")
+//      }
+//      require(isLoaded, "attempted to access resource before it was loaded")
+//      assume(x != null)
+//      x
+//    }
+//    def map = common.???
+//    def load() {
+//      x = loadFn(locator)
+//      isLoaded = true
+//    }
+//    override def toString = "Resource(%s)".format(locator)
+//  }
 
 }

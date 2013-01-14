@@ -24,16 +24,16 @@ object SpriteAnimation {
 }
 
 trait ImageAnimation extends Animation {
-  def frames:Map[Resource[Image], FrameOptions]
-  def images:IndexedSeq[Resource[Image]]
+  def frames:Map[Image, FrameOptions]
+  def images:IndexedSeq[Image]
 }
 
-class SpriteAnimation(var position:vec2, f:(Resource[Image], FrameOptions)*) extends SpriteLike with ImageAnimation {
+class SpriteAnimation(var position:vec2, f:(Image, FrameOptions)*) extends SpriteLike with ImageAnimation {
 
   var scale = vec2.one
   var rotation = 0.0
 
-  def this(position:vec2, images:Seq[Resource[Image]], durationMs:Int, offset:vec2=null) = this(position, {
+  def this(position:vec2, images:Seq[Image], durationMs:Int, offset:vec2=null) = this(position, {
     val opt = FrameOptions(durationMs, offset)
     images.map((_, opt))
   } : _*)
@@ -51,8 +51,9 @@ class SpriteAnimation(var position:vec2, f:(Resource[Image], FrameOptions)*) ext
   private var lastAdvance = millis
 
   def image = {
-    images(currentIndex).is
+    images(currentIndex)
   }
+
   //TODO: optimize
   def frame = frames(images(currentIndex))
   def imageOffset = if(frame.offset==null) vec(image.width/2, image.height/2) else frame.offset

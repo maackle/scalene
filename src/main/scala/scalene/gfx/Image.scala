@@ -4,53 +4,28 @@ import java.io.{FileInputStream, File}
 import org.newdawn.slick.opengl.TextureLoader
 import maackle.util._
 import scalene.core.Resource
+import scalene.core.traits.Render
 
-//class TooNiceImage(val tex:Tex, cliprect:ClipRect = null, centerPos:vec2 = null) extends SubTexture {
-//  lazy val clip = if(cliprect==null) ClipRect(0,0,texWidth,texHeight) else cliprect
-//  val (width, height) = (clip.w, clip.h)
-//  val center = if(centerPos==null) vec(width/2, height/2) else centerPos
-//
-//  def render() {
-//    gl.matrix {
-//      gl.translate(-center)
-//      blit()
-//    }
-//  }
-//}
 
-class Image(val tex:Tex, cliprect:ClipRect = null) extends SubTexture {
+trait ImageLike extends SubTexture with Render{
+  def clip:ClipRect
+  def width:Int
+  def height:Int
+}
+
+case class Image(val texResource:Resource[Tex], cliprect:ClipRect) extends ImageLike {
+
   lazy val clip = if(cliprect==null) ClipRect(0,0,texWidth,texHeight) else cliprect
   val (width, height) = (clip.w, clip.h)
   def render() { blit() }
+  override def toString = "Image(tex=%s, clip=%s)".format(tex, clip)
 }
 
 object Image {
 
-  def resource(path:String) = Resource(path)(Image.load)
-  def load(path:String) = new Image(new Tex(loadTexture(path)))
-  def load(file:File) = new Image(new Tex(loadTexture(file)))
-
-  private def loadTexture(path:String) = {
-    val reg = """.*\.(.+?)$""".r
-    val reg(ext) = path
-    val tex = ext match {
-      case "png" | "gif" | "jpg" | "jpeg" => { TextureLoader.getTexture(ext, getStream(path)) }
-      case _ => throw new Exception("image format '%s' is not recognized".format(ext))
-    }
-    tex
+  def apply(path:String, clip:ClipRect = null) = {
+    new Image(Resource(path)(Tex.load), clip)
   }
 
-  //TODO: test!
-  private def loadTexture(file:File) = {
-    assert(file.isFile)
-    val reg = """.*\.(.+?)$""".r
-    val path = file.getPath
-    val reg(ext) = path
-    val tex = ext match {
-      case "png" | "gif" | "jpg" | "jpeg" => { TextureLoader.getTexture(ext, new FileInputStream(file)) }
-      case _ => throw new Exception("image format '%s' is not recognized".format(ext))
-    }
-    tex
-  }
 }
 

@@ -60,8 +60,10 @@ trait ThingStore[M] extends Update {
     super.__update(dt)
 
     for (t <- everything) {
-      if (t.isInstanceOf[Update]) {
-        t.asInstanceOf[Update].__update(app.dt)
+      t match {
+        case t:Update => t.__update(app.dt)
+//        case t:Resource[Update] => t.is.__update(app.dt)
+        case _ =>
       }
     }
   }
@@ -71,6 +73,7 @@ trait ThingStore[M] extends Update {
 
   def renderables = __things flatMap {
     case t:Render => Some(t)
+//    case t:Resource[Render] => Some(t.is)
     case _ => None
   }
 }

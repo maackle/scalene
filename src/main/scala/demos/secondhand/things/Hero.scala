@@ -22,7 +22,7 @@ class Hero(var position:vec2) extends Ship with EventSink with HandyHandlers {
 
   import Hero._
 
-  val imageResource = Resource("img/ship.png")(Image.load)
+  val image = Image("img/ship.png")
   var velocity, acceleration = vec2.zero
   def rotation = (velocity).angle - math.Pi.toFloat/2
 

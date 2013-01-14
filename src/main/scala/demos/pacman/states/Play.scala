@@ -1,12 +1,12 @@
 package demos.pacman.states
 
 import scalene.core.{View2D, State}
-import demos.pacman.{Pacman => Game}
 import scalene.gfx.Color
 import demos.pacman.things.Pacman
 import scalene.vector.vec
 import scalene.event.{KeyDownEvent, EventHandler, EventSink}
 import scalene.misc.Easing
+import demos.pacman.{Pacman => Game}
 
 class Play extends State(Game) with EventSink {
 
