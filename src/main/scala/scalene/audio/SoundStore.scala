@@ -110,7 +110,7 @@ class ALsource() {
 
   def gain(v:Float):ALsource = { setf(AL10.AL_GAIN, v); this}
   def loop(v:Boolean):ALsource = { seti(AL10.AL_LOOPING, if(v) 1 else 0); this }
-  def play(forceRestart:Boolean=false) {
+  def play(forceRestart:Boolean=true) {
     if(forceRestart || !playing) {
       AL10.alSourcePlay(sourcebuf.get(0))
     }

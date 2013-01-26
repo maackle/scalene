@@ -6,6 +6,7 @@ import scalene.vector.{vec, vec2}
 import scalene.helpers.Memory
 import scalene.gfx
 import gfx.Color
+import demos.heart.{TimeSync, states}
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,11 +15,14 @@ import gfx.Color
  * Time: 9:51 AM
  * To change this template use File | Settings | File Templates.
  */
-class HeartMonitor(val position:vec2, dimensions:(Float, Float)) extends Render with Update with RectangleShape {
+class HeartMonitor(val position:vec2, dimensions:(Float, Float))(implicit val state:states.Play)
+  extends Render
+  with Update
+  with TimeSync
+  with RectangleShape {
 
   val (width, height) = dimensions
   val periodWidth = 2.33f
-  var duration = 0.9f
   val dotRadius = 5f
   val lineWidth = 3f
   val color = Color.cyan
@@ -26,21 +30,18 @@ class HeartMonitor(val position:vec2, dimensions:(Float, Float)) extends Render 
   val points = {
     val tail = 0.2f
     List(
-      vec(0.0, 0),
-      vec(0.05, 1),
-      vec(0.1, -0.8),
-      vec(0.15, tail/3),
-      vec(0.2, tail),
-      vec(0.35, -tail/4),
-      vec(0.55, tail/5),
-      vec(0.75, -tail/6),
+      vec(0.0, 1),
+      vec(0.15, -0.8),
+      vec(0.2, tail/3),
+      vec(0.25, tail),
+      vec(0.4, -tail/4),
+      vec(0.6, tail/5),
+      vec(0.8, -tail/6),
       vec(1f, 0)
     )
   }
 
-  val mem = new Memory[vec2](30, vec2.zero)
-
-  private var t:Float = 0
+  val mem = new Memory[vec2](60, vec2.zero)
 
   def between(p1:vec2, p2:vec2) = {
     val diff = p2 - p1
@@ -63,12 +64,11 @@ class HeartMonitor(val position:vec2, dimensions:(Float, Float)) extends Render 
   }
 
   def update(dt:Float) {
-    t += dt
-    val x = (t / duration) % 1
-    val T = t % periodWidth
+    val x = (T / period) % 1
+    val screenX = T % periodWidth
     for ((p, q) <- maackle.util.pairs(points)) {
       if (p.x <= x && x < q.x) {
-        val pos = vec(T, between(p,q)(x)) * vec(width/periodWidth, height/2) - vec(width/2, 0)
+        val pos = vec(screenX, between(p,q)(x)) * vec(width/periodWidth, height/2) - vec(width/2, 0)
         val w = 0.4f
         val next = (pos * w) + (mem.now * (1-w))
         mem << pos

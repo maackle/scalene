@@ -11,7 +11,7 @@ import scalene.common._
 import scalene.misc.SolidBackground
 import scalene.vector.{vec, vec2}
 
-trait View extends Render with InternalTransform {
+trait View extends Render {
 
   private var lastUpdate = 0
   def update() { ??? }
@@ -51,27 +51,25 @@ object View2D {
 //  def simple(clearColor:Color)(things:Render*):View2D = simple(clearColor, things)
   def simple(clearColor:Color, thing:Render):View2D = simple(clearColor, Seq(thing))
   def simple(clearColor:Color, things:Traversable[Render]):View2D = {
-    new View2D {
-      val layers = (
-        Layer2D(0, SolidBackground(clearColor)) ::
-        Layer2D(1, things) ::
-        Nil
-      )
-    }
+    val view = new View2D {}
+    view += Layer2D(0, SolidBackground(clearColor))
+    view += Layer2D(1, things)
+    view
   }
 
   def apply(layers:Layer2D*) = {
     val ls = layers
-    new View2D {
-      val layers = ls
-    }
+    val view = new View2D {}
+    view ++= ls
+    view
   }
 
   def apply(clearColor:Color)(layers:Layer2D*) = {
     val ls = layers
-    new View2D {
-      val layers = Layer2D.apply(0, SolidBackground(clearColor)) +: ls
-    }
+    val view = new View2D {}
+    view += Layer2D(0, SolidBackground(clearColor))
+    view ++= ls
+    view
   }
 
 }
@@ -92,14 +90,17 @@ object Layer2D {
 //  def apply(parallax:Real, thing:Render) = {
 //    new Layer2D(parallax)(Seq(thing))
 //  }
-
 }
 class Layer2D(protected val things:Traversable[Render], val parallax:Real=1) extends Layer {
   val __transform = Transform {
-    if(parallax!=1)
-      gl.scale(vec(parallax, parallax))
+    if(parallax != 0 && parallax!=1)
+      ???
   }
   def toSeq = things
+}
+
+class LayerHUD(things:Traversable[Render]) extends Layer2D(things, 1) {
+  override val __transform = null
 }
 
 
@@ -116,13 +117,15 @@ trait View2D extends View { view =>
     _scale.y = zoom
     _scale
   }
-  val __transform = Transform {
-    gl.translate(-scroll)
-    gl.scale(scale)
-    gl.rotateRad(rotation)
-  }
 
-  def layers:Seq[Layer2D]
+  protected val layers: collection.mutable.ListBuffer[Layer2D] = collection.mutable.ListBuffer()
+
+  def +=(layer:Layer2D) {
+    layers += layer
+  }
+  def ++=(ls:Traversable[Layer2D]) {
+    layers ++= ls
+  }
 
   def thingsNearToFar:Seq[Render] = {
     val it = layers.map(_.toSeq).reverse.flatten
@@ -130,8 +133,19 @@ trait View2D extends View { view =>
   }
 
   def render() {
-    __transform {
-      layers foreach { layer => layer.__render() }
+    layers foreach { layer =>
+      layer match {
+        case l:LayerHUD =>
+          l.__render()
+        case l:Layer2D =>
+          gl.matrix {
+            gl.translate(-scroll)
+            gl.scale(scale)
+            gl.rotateRad(rotation)
+            l.__render()
+          }
+      }
+
     }
   }
 

@@ -21,7 +21,7 @@ class Walker(val position:vec2=vec2.zero)
   with CircleShape
   with HandyHandlers {
 
-  val speed = 10f
+  val speed = 30f
   val rotation = 0.0
   val scale = vec2.one
   val acceleration = vec2.zero
@@ -33,6 +33,7 @@ class Walker(val position:vec2=vec2.zero)
   }
 
   def render() {
+    color.bind()
     gfx.draw.circle(radius, position)
   }
 

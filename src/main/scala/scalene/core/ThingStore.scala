@@ -66,6 +66,7 @@ trait ThingStore[M] extends Update {
         case _ =>
       }
     }
+
   }
 
   protected def __things:Traversable[M]

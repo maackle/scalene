@@ -28,7 +28,8 @@ trait Transform { self =>
 trait InternalTransform extends Render {
   protected def __transform:Transform
   abstract override def __render() {
-    __transform.apply { super.__render() }
+    if(__transform!=null) __transform.apply { super.__render() }
+    else super.__render()
   }
 }
 
