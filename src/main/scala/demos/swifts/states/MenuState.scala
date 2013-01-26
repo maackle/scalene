@@ -117,6 +117,6 @@ class MenuState extends State(TheSwifts) with HandyHandlers {
   )
 
   val handler = {
-    zoomer(view, 0.99f)(KEY_MINUS, KEY_EQUALS) ++ panner(view, 5)()
+    zoomer(view, 0.99f)(KEY_MINUS, KEY_EQUALS) ++ panner(view, 5)(KEY_W, KEY_A, KEY_S, KEY_D)
   }
 }

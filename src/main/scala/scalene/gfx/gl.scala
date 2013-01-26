@@ -41,7 +41,7 @@ trait gl {
 
   @inline
   def clear(color: Color) {
-    glClearColor(color.r, color.g, color.b, 0)
+    glClearColor(color.r, color.g, color.b, color.a)
     glClear(GL_COLOR_BUFFER_BIT)
   }
 

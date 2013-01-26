@@ -32,7 +32,7 @@ package object util {
 
   def pairs[T](seq: Seq[T]) = {
     if (seq.size > 1)
-      seq.slice(0, seq.size - 2).zip(seq.slice(1, seq.size - 1))
+      seq.slice(0, seq.size - 1).zip(seq.slice(1, seq.size))
     else
       throw new Exception("must have at least 2 elements to form pairs")
   }
