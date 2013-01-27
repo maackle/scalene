@@ -22,7 +22,7 @@ class HeartMonitor(val position:vec2, dimensions:(Float, Float))(implicit val st
   with RectangleShape {
 
   val (width, height) = dimensions
-  val periodWidth = 2.33f
+  val periodWidth = 4f
   val dotRadius = 5f
   val lineWidth = 3f
   val color = Color.cyan
@@ -55,7 +55,7 @@ class HeartMonitor(val position:vec2, dimensions:(Float, Float))(implicit val st
     gfx.draw.lineWidth(lineWidth)
     for (((p,q),i) <- maackle.util.pairs(mem.mem).view.zipWithIndex) {
       val col = color.alpha(i.toFloat / mem.mem.size)
-      if(p.x <= q.x) {
+      if(p.x < q.x) {
         col.bind()
         gfx.draw.line(p,q)
       }

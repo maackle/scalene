@@ -14,6 +14,7 @@ import gfx.{AutoTransformer2D, Color}
  * Time: 11:35 AM
  * To change this template use File | Settings | File Templates.
  */
+
 class Walker(val position:vec2=vec2.zero)
   extends Update
   with Render

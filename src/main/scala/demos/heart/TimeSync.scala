@@ -11,6 +11,6 @@ package demos.heart
 trait TimeSync {
   def state: states.Play
   def T = state.time
-  def tempo:Float = state.tempo
-  def period = 60f / tempo
+  lazy val tempo:Float = state.tempo
+  lazy val period = 60f / tempo
 }

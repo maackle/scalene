@@ -15,6 +15,7 @@ import org.lwjgl.util.WaveData
 import org.newdawn.slick.openal.{OggInputStream, OggDecoder}
 import java.nio.{IntBuffer, FloatBuffer, ByteBuffer}
 import maackle.{util => maack}
+import scalene.vector.vec2
 
 trait Sound {
   def playing:Boolean
@@ -34,19 +35,27 @@ class ALsource() {
   private var sourcePos: FloatBuffer = BufferUtils.createFloatBuffer(3).put(Array[Float](0.0f, 0.0f, 0.0f))
   private var sourceVel: FloatBuffer = BufferUtils.createFloatBuffer(3).put(Array[Float](0.0f, 0.0f, 0.0f))
 
-  def setPos(pos:(Float,Float,Float)) {
+  def setPos(pos:(Float,Float,Float)) = {
     sourcePos.rewind()
     sourcePos.put(Array(pos._1, pos._2, pos._3))
     sourcePos.flip()
+    AL10.alSource(id, AL10.AL_POSITION, sourcePos)
+    this
   }
-  def setVel(v:(Float,Float,Float)) {
+  def setVel(v:(Float,Float,Float)) = {
     sourceVel.rewind()
     sourceVel.put(Array(v._1, v._2, v._3))
     sourceVel.flip()
+    AL10.alSource(id, AL10.AL_VELOCITY, sourceVel)
+    this
   }
 
-  setPos(0,0,0)
-  setVel(0,0,0)
+  def setAttenuation(ref:Float, max:Float, rolloff:Float) = {
+    setf(AL_REFERENCE_DISTANCE, ref)
+    setf(AL_MAX_DISTANCE, max)
+    setf(AL_ROLLOFF_FACTOR, rolloff)
+    this
+  }
 
   def playing = alGetSourcei(id, AL_SOURCE_STATE) == AL_PLAYING
 
@@ -67,15 +76,6 @@ class ALsource() {
 
   def id:Int = sourcebuf.get(0)
 
-  def logg(is:InputStream) {
-    val ois = new OggInputStream(is)
-    val bytes = new Array[Byte](ois.getLength)
-    ois.read(bytes)
-    val buf = ByteBuffer.allocateDirect(bytes.length)
-    buf.put(bytes)
-    buf.flip()
-    load(AL10.AL_FORMAT_VORBIS_EXT, buf, ois.getRate)
-  }
   def loadOgg(is:InputStream) {
     val dec = new OggDecoder()
     val ogg = dec.getData(is)
@@ -99,9 +99,11 @@ class ALsource() {
     check("44")
     AL10.alSourcef(id, AL10.AL_PITCH, 1.0f)
     AL10.alSourcef(id, AL10.AL_GAIN, 1.0f)
-    AL10.alSource(id, AL10.AL_POSITION, sourcePos)
-    AL10.alSource(id, AL10.AL_VELOCITY, sourceVel)
     check("55")
+
+
+    setPos(0,0,0)
+    setVel(0,0,0)
     this
   }
 
@@ -169,6 +171,13 @@ class SoundStore(private val nullify:Boolean=false) {
 
   def initialized = SoundStore.initialized_?
 
+  def setDefaultAttenuation(ref:Float, max:Float, rolloff:Float) {
+    defaultReferenceDistance = ref
+    defaultMaxDistance = max
+    defaultRolloffFactor = rolloff
+  }
+  private var defaultReferenceDistance, defaultMaxDistance, defaultRolloffFactor = 0f
+
   def addSource(path:String, name:String=null, loop:Boolean=false): ALsource = {
     if(!SoundStore.enabled) return NullSource
     require(initialized, "Must call SoundStore.initialize()")
@@ -186,6 +195,10 @@ class SoundStore(private val nullify:Boolean=false) {
     catch {
       case e:NullPointerException => println("couldn't load sound clip %s".format(path))
     }
+
+    if (defaultReferenceDistance > 0 || defaultMaxDistance > 0)
+      s.setAttenuation(defaultReferenceDistance, defaultMaxDistance, defaultRolloffFactor)
+
     val key = if(name==null) filename else name
     if(sources.contains(key)) throw new Exception("A sound named \"%s\" already exists in this SoundStore")
     sources += key -> s
@@ -235,10 +248,17 @@ object SoundStore {
     }
     initialized_? = true
     AL10.alGetError
+    AL10.alListenerf(AL_GAIN, 1f)
     AL10.alListener(AL10.AL_POSITION, listenerPos)
     AL10.alListener(AL10.AL_VELOCITY, listenerVel)
     AL10.alListener(AL10.AL_ORIENTATION, listenerOri)
     enabled = true
+  }
+  def setListenerPos(pos:vec2) {
+    SoundStore.listenerPos.clear()
+    SoundStore.listenerPos.put(Array(pos.x, pos.y, 0))
+    listenerPos.flip()
+    AL10.alListener(AL10.AL_POSITION, listenerPos)
   }
   private var enabled = true
   def disable() {
