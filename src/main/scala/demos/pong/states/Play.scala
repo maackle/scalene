@@ -11,7 +11,7 @@ import scalene.physics.Worldly
 import org.jbox2d.dynamics.World
 import scalene.vector.vec
 import org.jbox2d.dynamics
-import scalene.event.{KeyHoldEvent, KeyDownEvent, EventHandler, HandyHandlers}
+import scalene.event.{KeyHold, KeyDown, EventHandler, HandyHandlers}
 
 class Play extends State(Pong) with Worldly with HandyHandlers {
 
@@ -39,8 +39,8 @@ class Play extends State(Pong) with Worldly with HandyHandlers {
   view.zoom = math.sqrt(scale).toFloat
 
   val handler = zoomer(view, 0.99f)(KEY_MINUS, KEY_EQUALS) ++ EventHandler {
-    case KeyHoldEvent(KEY_G) =>
+    case KeyHold(KEY_G) =>
       ball.dScale *= 0.90f
-    case KeyHoldEvent(KEY_H) => ball.dScale /= 0.90f
+    case KeyHold(KEY_H) => ball.dScale /= 0.90f
   }
 }

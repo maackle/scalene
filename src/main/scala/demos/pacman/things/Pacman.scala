@@ -1,7 +1,7 @@
 package demos.pacman.things
 
 import scalene.core.traits.{Update, Render}
-import scalene.event.{KeyDownEvent, EventHandler, EventSink}
+import scalene.event.{KeyDown, EventHandler, EventSink}
 import scalene.components.Velocity2D
 import scalene.vector.{vec, vec2}
 import scalene.gfx.{Color, gl, AutoTransformer2D, draw}

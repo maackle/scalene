@@ -1,7 +1,7 @@
 package demos.dolphin.things
 
 import scalene.core.traits.{Update, Render}
-import scalene.event.{KeyUpEvent, KeyDownEvent, EventHandler, EventSink}
+import scalene.event.{KeyUp, KeyDown, EventHandler, EventSink}
 import scalene.components.Velocity2D
 import scalene.vector.{vec, vec2}
 import scalene.gfx._
@@ -17,8 +17,8 @@ class Dolphin extends {
   pause()
 
   val handler = EventHandler {
-    case KeyDownEvent(KEY_SPACE) => play()
-    case KeyUpEvent(KEY_SPACE) => pause()
+    case KeyDown(KEY_SPACE) => play()
+    case KeyUp(KEY_SPACE) => pause()
   }
 
 }

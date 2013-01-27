@@ -3,7 +3,7 @@ package demos.dolphin.states
 import scalene.core.{Resource, View2D, State}
 import scalene.gfx.{Image, SpriteSheet, Color}
 import scalene.vector.vec
-import scalene.event.{KeyDownEvent, EventHandler, EventSink}
+import scalene.event.{KeyDown, EventHandler, EventSink}
 import scalene.misc.Easing
 import demos.dolphin.Dolphin
 import demos.dolphin.things.Dolphin

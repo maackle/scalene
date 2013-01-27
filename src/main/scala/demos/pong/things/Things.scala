@@ -6,7 +6,7 @@ import scalene.components.{RectangleShape, Velocity2D}
 import demos.pong.things.Arena.Side
 import scalene.vector.{vec2, vec}
 import scalene.gfx.{AutoTransformer2D, Color, draw}
-import scalene.event.KeyHoldEvent
+import scalene.event.KeyHold
 import scalene.common
 import common._
 import scalene.physics.Physical
@@ -71,11 +71,11 @@ class Paddle(arena:Arena, side:Arena.Side, controls:Paddle.Controls)
   val handler = {
     def go(x:Float, y:Float) = { body.applyForce(vec(x,y).unit * 100000f, body.getPosition) }
     EventHandler {
-      case KeyHoldEvent(controls.upKey) => go(0, 1)
-      case KeyHoldEvent(controls.downKey) => go(0, -1)
-      case KeyHoldEvent(controls.leftKey) => go(-1, 0)
-      case KeyHoldEvent(controls.rightKey) => go(1, 0)
-//      case KeyUpEvent(controls.upKey) | KeyUpEvent(controls.downKey) =>
+      case KeyHold(controls.upKey) => go(0, 1)
+      case KeyHold(controls.downKey) => go(0, -1)
+      case KeyHold(controls.leftKey) => go(-1, 0)
+      case KeyHold(controls.rightKey) => go(1, 0)
+//      case KeyUp(controls.upKey) | KeyUp(controls.downKey) =>
 //        velocity.y = 0
     }
   }

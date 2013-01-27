@@ -11,6 +11,7 @@ import scalene.vector.{vec, vec2}
 import grizzled.slf4j.Logging
 import java.awt
 import org.lwjgl.opengl.GL11
+import scalene.core.Resource
 
 class TTF(path:String, size:Int, style:TTF.FontStyle.Plain.type) {
 
@@ -64,6 +65,8 @@ object TTF extends Logging {
 //    info("loaded font: " + font)
 //    font
 //  }
+
+  lazy val default = Resource("font/UbuntuMono-R.ttf")(TTF(_, 20)).is
 
   def load(path:String, size:Float) = {
     val base = awt.Font.createFont(awt.Font.TRUETYPE_FONT, getStream(path))

@@ -6,19 +6,18 @@ import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl._
 import grizzled.slf4j.{Logger, Logging}
 import scalene.input.LWJGLKeyboard
-import scalene.event.{Event, KeyEventSource, EventSource}
+import scalene.event.{MouseEventSource, Event, KeyEventSource, EventSource}
 import scalene.helpers.MemDouble
 import traits.Initialize
-import scalene.core.State.StateMachine
 import scalene.common
 import scalene.vector.vec
 import scalene.audio.SoundStore
+import org.lwjgl.opengl
 
-//trait ScaleneInnerClasses { app:ScaleneApp => }
 
 trait ScaleneAppDebug extends ScaleneApp {
 
-  lazy val font = Resource("font/UbuntuMono-R.ttf")(TTF(_, 20)).is
+  lazy val font = TTF.default
 
   def avgFPS:Double
   def debugColor:Color
@@ -50,7 +49,7 @@ with Initialize {
   lazy val msecsStartup = milliseconds
   def fullscreen = windowSize.isEmpty
 
-  protected lazy val stateMachine = new StateMachine(startState)
+  protected[scalene] lazy val stateMachine = new StateMachine(startState)
   private var _tick = 0
   private var _loopTime, _executionTime = MemDouble(32)
   private var _startupTime = 0.0
@@ -62,7 +61,8 @@ with Initialize {
   }
 
   private val _eventSources = collection.mutable.Set[EventSource[Event]](
-    new KeyEventSource
+    new KeyEventSource,
+    new MouseEventSource
   //TODO: add mouse source, controllers, etc.
   )
   def eventSources = _eventSources.toSeq

@@ -11,34 +11,45 @@ import scalene.common._
 import scalene.misc.SolidBackground
 import scalene.vector.{vec, vec2}
 
-trait View extends Render with InternalTransform {
+trait View extends Render with InternalTransform { view =>
 
   private var lastUpdate = 0
-  def update() { ??? }
+//  protected[scalene] def __update() {
+//
+//  }
 
-  protected object transforms {
-    private var viewport:IntBuffer = BufferUtils.createIntBuffer(16)
-    private var modelview:FloatBuffer = BufferUtils.createFloatBuffer(16)
-    private var projection:FloatBuffer = BufferUtils.createFloatBuffer(16)
-    private var winZ:FloatBuffer = BufferUtils.createFloatBuffer(1)
+  override def __render() {
+    __transform.apply {
+      super[Render].__render()
+      transforms.update()
+    }
+  }
+
+  protected[scalene] object transforms {
+    val viewport:IntBuffer = BufferUtils.createIntBuffer(16)
+    val modelview:FloatBuffer = BufferUtils.createFloatBuffer(16)
+    val projection:FloatBuffer = BufferUtils.createFloatBuffer(16)
+    private val winZ:FloatBuffer = BufferUtils.createFloatBuffer(1)
     private var winX:Float = 0
     private var winY:Float = 0
-    private var position:FloatBuffer = BufferUtils.createFloatBuffer(3)
+    private val position:FloatBuffer = BufferUtils.createFloatBuffer(3)
 
-    def update() {
+    private[View] def update() {
       GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, modelview)
       GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projection)
       GL11.glGetInteger(GL11.GL_VIEWPORT, viewport)
     }
 
     def toWorld(screen:vec2) :vec2 = {
-      winX = screen.x.toFloat; winY = screen.y.toFloat
+      winX = screen.x
+      winY = screen.y
       GLU.gluUnProject(winX, winY, 0, modelview, projection, viewport, position)
       vec(position.get(0), position.get(1))
     }
 
     def fromWorld(world :vec2) :vec2 = {
-      winX = world.x.toFloat; winY = world.y.toFloat
+      winX = world.x.toFloat
+      winY = world.y.toFloat
       GLU.gluProject(winX, winY, 0, modelview, projection, viewport, position)
       vec(position.get(0), position.get(1))
     }
@@ -133,6 +144,24 @@ trait View2D extends View { view =>
     __transform {
       layers foreach { layer => layer.__render() }
     }
+  }
+
+  // PURE GUESSWORK.  NO IDEA WHY THIS WORKS
+  def toWorld(screen:vec2):vec2 = {
+    if(rotation != 0) ???
+//    var ret:vec2 = null
+//    gl.matrix {
+//      gl.translate(-screen)
+//      ret = transforms.toWorld(screen)
+//    }
+//    ret
+    (transforms.toWorld(screen) + scroll) / zoom
+  }
+
+  // PURE GUESSWORK.  NO IDEA WHY THIS WORKS.
+  def fromWorld(world:vec2) = {
+    if(rotation != 0) ???
+    (transforms.fromWorld(world * zoom - scroll) )
   }
 
 }

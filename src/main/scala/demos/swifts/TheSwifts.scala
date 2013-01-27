@@ -11,10 +11,10 @@ import scalene.gfx.Color
  * To change this template use File | Settings | File Templates.
  */
 object TheSwifts extends ScaleneApp with ScaleneAppDebug {
-  val windowSize = Some(1000,1000)
+  val windowSize = Some(500,500)
   val windowTitle = "The Swifts"
 
-  lazy val startState = new states.PlayState
+  lazy val startState = new states.MenuState
 
   val debugColor = Color.black
 }

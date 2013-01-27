@@ -4,15 +4,13 @@ import demos.swifts.TheSwifts
 import demos.swifts.things.{Hawk, SwiftSwarm}
 import scalene.components._
 import scalene.core._
-import scalene.event.{EventHandler, KeyDownEvent, EventSink, HandyHandlers}
+import scalene.event._
 import scalene.gfx._
 import scalene.vector.{vec, vec2}
 import scalene.core.traits.{Render, Update}
-import scalene.event.KeyDownEvent
 import org.lwjgl.opengl.GL11
 import collection.mutable.ArrayBuffer
-import scalene.event.KeyDownEvent
-import scalene.event.KeyDownEvent
+import scalene.event.KeyDown
 
 trait Menu extends Render with Update with EventSink {
 
@@ -30,8 +28,8 @@ trait Menu extends Render with Update with EventSink {
   }
 
   val handler = EventHandler {
-    case KeyDownEvent(KEY_DOWN) => current = (current + 1) % items.size
-    case KeyDownEvent(KEY_UP) => current = (current - 1) % items.size
+    case KeyDown(KEY_DOWN) => current = (current + 1) % items.size
+    case KeyDown(KEY_UP) => current = (current - 1) % items.size
   }
 }
 
@@ -83,7 +81,7 @@ class CloudSystem extends PointParticleSystem {
     def update(dt:Float) {
       color.a -= 0.0001f
       color.r -= 0.0001f
-      if(color.a < 0) color.a = 0
+      if (color.a < 0) color.a = 0
     }
 
   }
@@ -108,7 +106,7 @@ class MenuState extends State(TheSwifts) with HandyHandlers {
   val clouds = new CloudSystem
 
   this += menu
-  this += clouds
+//  this += clouds
 
   val view = View2D(
     Layer2D(school),
@@ -116,7 +114,11 @@ class MenuState extends State(TheSwifts) with HandyHandlers {
     Layer2D(clouds)
   )
 
-  val handler = {
-    zoomer(view, 0.99f)(KEY_MINUS, KEY_EQUALS) ++ panner(view, 5)()
+
+
+  val handler = EventHandler {
+    case KeyDown(key) =>
+      changeState(new PlayState)
+
   }
 }
