@@ -5,17 +5,11 @@ import scalene.event.{HandyHandlers, EventHandler, EventSink}
 import scalene.components.{Verlet2D, CircleShape, Velocity2D}
 import scalene.vector.vec2
 import scalene.gfx
-import gfx.{AutoTransformer2D, Color}
+import gfx.{gl, AutoTransformer2D, Color}
+import org.lwjgl.opengl.GL11
 
-/**
- * Created with IntelliJ IDEA.
- * User: michael
- * Date: 1/26/13
- * Time: 11:35 AM
- * To change this template use File | Settings | File Templates.
- */
 
-class Walker(val position:vec2=vec2.zero)
+class Walker(val monitor:HeartMonitor, val position:vec2=vec2.zero)
   extends Update
   with Render
   with Verlet2D
@@ -30,7 +24,18 @@ class Walker(val position:vec2=vec2.zero)
   val radius = 1f
   val color = Color.blue
 
+  val maxHealth = 10f
+  private var _health = maxHealth
+  def health = _health
+
   def update(dt:Float) {
+    monitor.aberration = (maxHealth - _health)
+    monitor.update(dt)
+  }
+
+  def acceptScore(score:Float) {
+    _health += score
+    _health = math.min(_health, maxHealth)
   }
 
   def render() {

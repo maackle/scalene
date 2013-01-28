@@ -8,16 +8,23 @@ import scalene.vector.vec2
 import scalene.common._
 import org.lwjgl.opengl.GL11
 
-trait RenderBatch[T] extends Render with Update with IndexedThingStore[T] {
+trait RenderBatch[T] extends Render with Update with IndexedThingStoreSpecific[T] {
 
   def vertexCapacity:Int
   def drawMode:Int
+
+  val updateSelf = true
+
+  override def __update(dt:Float) {
+    if(updateSelf) update(dt)
+    super.__update(dt:Float)
+  }
 
 //  protected var positions:Array[vec2] = null
 //  protected var rotations:Array[Radian] = null
   def vbo:VBO
 
-  def update()
+  def update(dt:Float)
 
   def render() {
     vbo.draw(drawMode)
@@ -27,7 +34,7 @@ trait RenderBatch[T] extends Render with Update with IndexedThingStore[T] {
 
 trait VectorBatch[T <: Position2D] extends RenderBatch[T] {
 
-  def update() {
+  def update(dt:Float) {
     val a = {
         for(t <- everything) yield {
           t.position
@@ -41,7 +48,7 @@ trait ShapeBatch extends VectorBatch[Position2D with Rotation] {
 
   def shape:Array[vec2]
 
-  override def update() {
+  override def update(dt:Float) {
     val a = {
         for (t <- everything; s <- shape) yield {
           (t.position + s.rotate(t.rotation))

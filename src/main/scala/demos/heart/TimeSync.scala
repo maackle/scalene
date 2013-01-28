@@ -12,5 +12,7 @@ trait TimeSync {
   def state: states.Play
   def T = state.time
   lazy val tempo:Float = state.tempo
-  lazy val period = 60f / tempo
+  lazy val period = state.period
+
+  def latencyCorrection = state.latencyCorrection
 }

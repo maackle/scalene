@@ -85,13 +85,13 @@ class Color(var r: Float, var g: Float, var b: Float, var a: Float = 1.0f) {
   def value = (r + g + b) / 3
 
   //NOTE: what to do about alpha values?
-  def +(o: Color) = new Color(r + o.r, g + o.g, b + o.b, (a + o.a) / 2)
+  def +(o: Color) = new Color(r + o.r, g + o.g, b + o.b, (a + o.a))
 
-  def -(o: Color) = new Color(r - o.r, g - o.g, b - o.b, (a + o.a) / 2)
+  def -(o: Color) = new Color(r - o.r, g - o.g, b - o.b, (a + o.a))
 
-  def *(v: Float) = new Color(clamp(r * v, 0, 1), clamp(g * v, 0, 1), clamp(b * v, 0, 1), a)
+  def *(v: Float) = new Color(clamp(r * v, 0, 1), clamp(g * v, 0, 1), clamp(b * v, 0, 1),  clamp(a * v, 0, 1))
 
-  def **(v: Float) = new Color(1 - r / v, 1 - g / v, 1 - b / v, a)
+  def **(v: Float) = new Color(1 - r / v, 1 - g / v, 1 - b / v, 1 - a / v)
 
-  def /(v: Float) = new Color(r / v, g / v, b / v, a)
+  def /(v: Float) = new Color(r / v, g / v, b / v, a / v)
 }

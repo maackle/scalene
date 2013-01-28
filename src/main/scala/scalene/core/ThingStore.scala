@@ -6,22 +6,31 @@ import scala.Some
 import scalene.physics.Physical
 import scalene.misc.Easing
 
-trait IndexedThingStore[M] extends ThingStore[M] {
+trait IndexedThingStoreSpecific[T] extends ThingStore[T] {
 
-  protected var __things = collection.mutable.IndexedSeq[M]()
+  def updateSelf:Boolean
+  override protected val __things = collection.mutable.ListBuffer[T]()
 
-  protected[scalene] def += (t:M) { assert(t!=this); __things ++ Seq(t) }
-  protected[scalene] def ++= (t:Seq[M]) { assert(t!=this); __things ++= t }
+  protected[scalene] def += (t:T) { __things += t }
+  protected[scalene] def ++= (t:Seq[T]) { __things ++= t }
+}
+
+trait IndexedThingStore extends ThingStore[Any] {
+
+  protected val __things = collection.mutable.ListBuffer[Any]()
+
+  protected[scalene] def += (t:Any) { __things += t }
+  protected[scalene] def ++= (t:Seq[Any]) { __things ++= t }
 }
 
 trait HashedThingStore extends ThingStore[Any] { self =>
 
-  protected var __things = collection.mutable.Set[Any]()
+  protected val __things = collection.mutable.Set[Any]()
 
-  protected[scalene] def += (t:Any) { assert(t!=this); __things += t }
-  protected[scalene] def ++= (t:Seq[Any]) { assert(t!=this); __things ++= t }
-  protected[scalene] def -= (t:Any) { assert(t!=this); __things -= t }
-  protected[scalene] def --= (t:Seq[Any]) { assert(t!=this); __things --= t }
+  protected[scalene] def += (t:Any) {  __things += t }
+  protected[scalene] def ++= (t:Seq[Any]) { __things ++= t }
+  protected[scalene] def -= (t:Any) { __things -= t }
+  protected[scalene] def --= (t:Seq[Any]) { __things --= t }
 
   object Transition {
     def create(seconds:Float, easing:Easing = null)(fn:Float=>Unit) = {
@@ -49,20 +58,16 @@ trait ThingStore[M] extends Update {
 
   def app:ScaleneApp
 
-//  def drain[A <: Event, B >: A <: Event](source:EventSource[A])(sinks:Iterable[EventSinkSpecific[B]]) {
-//    for(sink <- sinks if sink.isInstanceOf[EventSinkSpecific[B]]) {
-//      source.presentTo(sink)
-//    }
-//  }
-
   abstract override def __update(dt:Float) {
 
-    super.__update(dt)
+    // LET THIS BE.  This way you must add the ThingStore to itself in order to update
+//    super.__update(dt)
 
     for (t <- everything) {
+      val self = this
       t match {
+        case `self` => this.update(app.dt)
         case t:Update => t.__update(app.dt)
-//        case t:Resource[Update] => t.is.__update(app.dt)
         case _ =>
       }
     }

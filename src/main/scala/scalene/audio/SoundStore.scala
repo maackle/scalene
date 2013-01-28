@@ -35,16 +35,17 @@ class ALsource() {
   private var sourcePos: FloatBuffer = BufferUtils.createFloatBuffer(3).put(Array[Float](0.0f, 0.0f, 0.0f))
   private var sourceVel: FloatBuffer = BufferUtils.createFloatBuffer(3).put(Array[Float](0.0f, 0.0f, 0.0f))
 
-  def setPos(pos:(Float,Float,Float)) = {
+  def setPos(pos:vec2):ALsource = {
     sourcePos.rewind()
-    sourcePos.put(Array(pos._1, pos._2, pos._3))
+    sourcePos.put(Array(pos.x, pos.y, 0))
     sourcePos.flip()
     AL10.alSource(id, AL10.AL_POSITION, sourcePos)
     this
   }
-  def setVel(v:(Float,Float,Float)) = {
+
+  def setVel(vel:vec2) = {
     sourceVel.rewind()
-    sourceVel.put(Array(v._1, v._2, v._3))
+    sourceVel.put(Array(vel.x, vel.y, 0))
     sourceVel.flip()
     AL10.alSource(id, AL10.AL_VELOCITY, sourceVel)
     this
@@ -101,9 +102,8 @@ class ALsource() {
     AL10.alSourcef(id, AL10.AL_GAIN, 1.0f)
     check("55")
 
-
-    setPos(0,0,0)
-    setVel(0,0,0)
+    setPos(vec2.zero)
+    setVel(vec2.zero)
     this
   }
 
@@ -111,6 +111,7 @@ class ALsource() {
   private def seti(attr:Int, v:Int) = AL10.alSourcei(sourcebuf.get(0), attr, v)
 
   def gain(v:Float):ALsource = { setf(AL10.AL_GAIN, v); this}
+  def volume(level:Float) = { gain(math.sqrt(level*level).toFloat) }
   def loop(v:Boolean):ALsource = { seti(AL10.AL_LOOPING, if(v) 1 else 0); this }
   def play(forceRestart:Boolean=true) {
     if(forceRestart || !playing) {

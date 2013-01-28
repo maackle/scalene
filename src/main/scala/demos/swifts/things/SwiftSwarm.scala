@@ -38,8 +38,6 @@ class SwiftSwarm(size:Int, hawk:Hawk) extends TriangleBatch {
 
   val vbo = VBO.create(vertexCapacity, false, false, false)
 
-
-
   def app = TheSwifts
 
   val grid = ScaleneGrid.square(arenaDim, numGridDivisions, vec(0,0))(new GridCell)
@@ -62,6 +60,7 @@ class SwiftSwarm(size:Int, hawk:Hawk) extends TriangleBatch {
     val position = vec2.zero
     def render = draw()
   }
+
   val arenaPadding = new scalene.components.RectangleShape with Render {
     val width, height = arenaDim - 300
     val position = vec2.zero
@@ -117,7 +116,7 @@ class SwiftSwarm(size:Int, hawk:Hawk) extends TriangleBatch {
 
     for(swift <- swifts) swift.updateFeltForces(hawk, arenaPadding)
 
-    super.update()
+    super.update(dt)
   }
 
   def drawGrid() {
@@ -137,6 +136,7 @@ class SwiftSwarm(size:Int, hawk:Hawk) extends TriangleBatch {
   }
 
   override def render() {
+
     draw.fill(true)
 
     arenaColor.bind()
@@ -146,7 +146,6 @@ class SwiftSwarm(size:Int, hawk:Hawk) extends TriangleBatch {
 
     Color(0x333333).bind()
     super.render()
-
 
     Color(0xff7799).bind()
     draw.fill(false)

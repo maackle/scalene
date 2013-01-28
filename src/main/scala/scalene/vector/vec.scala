@@ -17,6 +17,7 @@ object vec extends Logging { self =>
   def apply(x: Float, y: Float) = vec2(x,y)
   def apply(a: (Float, Float)) = vec2(a._1, a._2)
   def apply(x: Double, y: Double) = vec2(x,y)
+  def apply(v:vec2) = vec2(v.x,v.y)
 //  def apply(a: (Double, Double)) = vec2(a._1, a._2)
 //  def apply(x:V, y:V, z:V) = new vec3(x,y,z)
 //  def apply(a: (V,V,V)) = new vec3(a._1, a._2, a._3)

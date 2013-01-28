@@ -7,6 +7,7 @@ import scalene.helpers.Memory
 import scalene.gfx
 import gfx.Color
 import demos.heart.{TimeSync, states}
+import maackle.util.Random
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,23 +23,26 @@ class HeartMonitor(val position:vec2, dimensions:(Float, Float))(implicit val st
   with RectangleShape {
 
   val (width, height) = dimensions
-  val periodWidth = 4f
-  val dotRadius = 5f
-  val lineWidth = 3f
-  val color = Color.cyan
+  val periodWidth = 2f // not what you expect...
+  val lineWidth = 4f
+  val dotRadius = lineWidth/2
+  val color = Color(0x800000)
+  var aberration:Float = 0f
+  val maxAmp = 0.9f
 
   val points = {
     val tail = 0.2f
     List(
-      vec(0.0, 1),
-      vec(0.15, -0.8),
-      vec(0.2, tail/3),
-      vec(0.25, tail),
-      vec(0.4, -tail/4),
-      vec(0.6, tail/5),
-      vec(0.8, -tail/6),
-      vec(1f, 0)
-    )
+      vec(0.01, 1),
+      vec(0.05, -0.8),
+      vec(0.1, tail/3),
+      vec(0.15, tail/2),
+      vec(0.3, -tail/4),
+      vec(0.5, tail/5),
+      vec(0.7, -tail/6),
+      vec(0.95, 0),
+      vec(1.0, 1)
+    ).map(_ * maxAmp)
   }
 
   val mem = new Memory[vec2](60, vec2.zero)
@@ -53,6 +57,7 @@ class HeartMonitor(val position:vec2, dimensions:(Float, Float))(implicit val st
   def render() {
     color.bind()
     gfx.draw.lineWidth(lineWidth)
+    gfx.draw.fill(true)
     for (((p,q),i) <- maackle.util.pairs(mem.mem).view.zipWithIndex) {
       val col = color.alpha(i.toFloat / mem.mem.size)
       if(p.x < q.x) {
@@ -64,13 +69,17 @@ class HeartMonitor(val position:vec2, dimensions:(Float, Float))(implicit val st
   }
 
   def update(dt:Float) {
-    val x = (T / period) % 1
+    val x = (T / period-latencyCorrection) % 1
     val screenX = T % periodWidth
     for ((p, q) <- maackle.util.pairs(points)) {
-      if (p.x <= x && x < q.x) {
-        val pos = vec(screenX, between(p,q)(x)) * vec(width/periodWidth, height/2) - vec(width/2, 0)
+      var (px, py) = (p.x, p.y)
+      var (qx, qy) = (q.x, q.y)
+      if (qx < px) qx += period
+      if (px <= x && x < qx) {
+        val fudge = aberration / 10f
+        val screenY = math.min(maxAmp, between(p,q)(x + fudge*fudge))
+        val pos = vec(screenX, screenY) * vec(width/periodWidth, height/2) - vec(width/2, 0)
         val w = 0.4f
-        val next = (pos * w) + (mem.now * (1-w))
         mem << pos
 //        if(q.x < next.x)
 //          mem << next

@@ -50,48 +50,65 @@ trait StateMixin extends ScaleneApp with ThingStore[Any] with StateEventHandling
 
 }
 
-abstract class State(val app:ScaleneApp) extends HashedThingStore with StateEventHandling with Render {
+abstract class StateIndexed(val app:ScaleneApp) extends StateBase with IndexedThingStore {
   def this(domain:Domain) = this(domain.app)
+}
+
+abstract class State(val app:ScaleneApp) extends StateBase with HashedThingStore {
+  def this(domain:Domain) = this(domain.app)
+}
+
+trait StateBase extends ThingStore[Any] with StateEventHandling with Render {
+
+  def app:ScaleneApp
   val view:View2D
 
-  protected def onEnter(bloc: =>Unit) {}
-  protected def onExit(bloc: =>Unit) {}
+  protected[scalene] def onEnter(bloc: =>Unit) {}
+  protected[scalene] def onExit(bloc: =>Unit) {}
 
-  def update(dt:Float) { /* typically handled by ThingStore */ }
+  def changeState(state:State) { app.stateMachine.change(state) }
+  def pushState(state:State) { app.stateMachine.push(state) }
+  def popState() { app.stateMachine.pop() }
+
+  def update(dt:Float) {
+
+  }
   def render() {
     if(view!=null) view.__render()
   }
 }
 
+class StateMachine(startState:StateBase) {
+  assert(startState != null)
+  private val stack = collection.mutable.Stack[StateBase]()
+
+  push(startState)
+
+  def current = {
+    assert(!stack.isEmpty)
+    stack.top
+  }
+
+  def change(s:StateBase) {
+    assert(!stack.isEmpty)
+    current.onExit()
+    stack.pop()
+    stack.push(s)
+    current.onEnter()
+  }
+
+  def push(s:StateBase) {
+    stack.push(s)
+    current.onEnter()
+  }
+
+  def pop() {
+    assert(!stack.tail.isEmpty)
+    val top = stack.pop()
+    top.onExit()
+  }
+}
 
 object State {
 
-  class StateMachine(startState:State) {
-    assert(startState != null)
-    private val stack = collection.mutable.Stack[State]()
-
-    push(startState)
-
-    def current = {
-      assert(!stack.isEmpty)
-      stack.top
-    }
-
-    def change(s:State) {
-      assert(!stack.isEmpty)
-      pop()
-      push(s)
-    }
-
-    def push(s:State) {
-      stack.push(s)
-      current.onEnter()
-    }
-
-    def pop() {
-      assert(!stack.tail.isEmpty)
-      val top = stack.pop()
-      top.onExit()
-    }
-  }
 }

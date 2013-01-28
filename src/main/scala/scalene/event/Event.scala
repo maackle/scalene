@@ -2,13 +2,14 @@ package scalene.event
 
 import scalene.common._
 import scalene.input.LWJGLKeyboard
-import scalene.core.{View2D, Op}
+import scalene.core.{View, View2D, Op}
 import scalene.helpers.MemBoolean
-import org.lwjgl.input.{Keyboard=>Kbd}
+import org.lwjgl.input.{Keyboard => Kbd, Mouse}
 import scalene.core.traits.{ScaleneMixin, Update}
 import collection.mutable
 import grizzled.slf4j.Logging
-import scalene.vector.vec2
+import scalene.vector.{vec, vec2}
+import scalene.core.View
 
 object Event {
   type Id = Int
@@ -19,19 +20,13 @@ trait Event {
   def code:Event.Id
 }
 
-trait KeyEvent extends Event
-
-case class KeyHoldEvent(code:Int) extends KeyEvent
-case class KeyDownEvent(code:Int) extends KeyEvent
-case class KeyUpEvent(code:Int) extends KeyEvent
-
-trait MouseEvent extends Event {
-  def position:vec2
+trait KeyEvent extends Event {
+  def code:Int
 }
 
-case class MouseDownEvent(code:Int, position:vec2) extends MouseEvent
-case class MouseUpEvent(code:Int, position:vec2) extends MouseEvent
-case class MouseHoldEvent(code:Int, position:vec2) extends MouseEvent
+case class KeyHold(code:Int) extends KeyEvent
+case class KeyDown(code:Int) extends KeyEvent
+case class KeyUp(code:Int) extends KeyEvent
 
 trait EventSource[+Unused <: Event] extends Update with Logging { self =>
   protected def raise(ev:Event) {
@@ -67,22 +62,53 @@ class KeyEventSource extends EventSource[KeyEvent] {
       val code = Kbd.getEventKey
       val down = Kbd.getEventKeyState
       if(down) {
-        raise( KeyDownEvent(code) )
+        raise( KeyDown(code) )
         downKeys += code
       }
       else {
-        raise( KeyUpEvent(code) )
+        raise( KeyUp(code) )
         downKeys -= code
       }
     }
 
-    for(code <- downKeys) raise( KeyHoldEvent(code) )
+    for(code <- downKeys) raise( KeyHold(code) )
   }
 }
 
+trait MouseEvent extends Event {
+  def windowPos:vec2
+}
+
+case class MouseHold(code:Int, windowPos:vec2) extends MouseEvent
+case class MouseClick(code:Int, windowPos:vec2) extends MouseEvent
+case class MouseRelease(code:Int, windowPos:vec2) extends MouseEvent
+
+//case class MouseLeftClick(override val windowPos: vec2) extends MouseClick(0, windowPos)
+//case class MouseLeftRelease(override val windowPos: vec2) extends MouseRelease(0, windowPos)
+//case class MouseRightClick(override val windowPos: vec2) extends MouseClick(1, windowPos)
+//case class MouseRightRelease(override val windowPos: vec2) extends MouseRelease(1, windowPos)
+
 class MouseEventSource extends EventSource[MouseEvent] {
 
-  def update(dt:Float) = ???
+  private val buttonState = collection.mutable.Map[Event.Id, MemBoolean]()
+
+  def update(dt:Float) = {
+    eventQueue.clear()
+
+    while(Mouse.next) {
+      val code = Mouse.getEventButton
+      val down = Mouse.getEventButtonState
+      val pos = vec(Mouse.getEventX, Mouse.getEventY)
+      if(code >= 0) {
+        val state = buttonState.getOrElseUpdate(code, MemBoolean(2))
+        state << down
+        if (state.xOn)
+          raise(MouseClick(code, pos))
+        else if (state.xOff)
+          raise(MouseRelease(code, pos))
+      }
+    }
+  }
 
 }
 
@@ -96,40 +122,40 @@ trait HandyHandlers extends EventSink {
   def zoomer(view:View2D, ratio:Real)(out:Int=KEY_MINUS, in:Int=KEY_EQUALS) = {
     val amt = if(ratio < 1) 1 / ratio else ratio
     EventHandler {
-      case KeyHoldEvent(`out`)  => view.zoom /= amt
-      case KeyHoldEvent(`in`)   => view.zoom *= amt
+      case KeyHold(`out`)  => view.zoom /= amt
+      case KeyHold(`in`)   => view.zoom *= amt
     }
   }
 
   def panner(view:View2D, pixels:Real)(up:Int=KEY_W, left:Int=KEY_A, down:Int=KEY_S, right:Int=KEY_D) = EventHandler {
-    case KeyHoldEvent(`left`)   => view.scroll.x -= pixels
-    case KeyHoldEvent(`right`)  => view.scroll.x += pixels
-    case KeyHoldEvent(`down`)   => view.scroll.y -= pixels
-    case KeyHoldEvent(`up`)     => view.scroll.y += pixels
+    case KeyHold(`left`)   => view.scroll.x -= pixels
+    case KeyHold(`right`)  => view.scroll.x += pixels
+    case KeyHold(`down`)   => view.scroll.y -= pixels
+    case KeyHold(`up`)     => view.scroll.y += pixels
   }
 
   def spinner(view:View2D, degrees:Real)(ccw:Int, cw:Int) = {
     val rads = deg2rad(degrees)
     EventHandler {
-      case KeyHoldEvent(`cw`)   => {
+      case KeyHold(`cw`)   => {
         view.rotation -= rads
       }
-      case KeyHoldEvent(`ccw`)  => {
+      case KeyHold(`ccw`)  => {
         view.rotation += rads
       }
     }
   }
 
   def mover(v:vec2, amount:Real)(up:Int, left:Int, down:Int, right:Int) = EventHandler {
-    case KeyDownEvent(`left`)   => v.x -= amount
-    case KeyDownEvent(`right`)  => v.x += amount
-    case KeyDownEvent(`down`)   => v.y -= amount
-    case KeyDownEvent(`up`)     => v.y += amount
-    case KeyUpEvent(`left`) |
-         KeyUpEvent(`right`) =>
+    case KeyDown(`left`)   => v.x -= amount
+    case KeyDown(`right`)  => v.x += amount
+    case KeyDown(`down`)   => v.y -= amount
+    case KeyDown(`up`)     => v.y += amount
+    case KeyUp(`left`) |
+         KeyUp(`right`) =>
       v.x = 0
-    case KeyUpEvent(`down`) |
-         KeyUpEvent(`up`) =>
+    case KeyUp(`down`) |
+         KeyUp(`up`) =>
       v.y = 0
   }
 }
@@ -139,53 +165,53 @@ object EventHandler {
   type Lifted = Function[Event, Option[Any]]
 
   def bindKey(key:Int)(down: =>Unit, up: =>Unit) = EventHandler {
-    case KeyDownEvent(`key`) => down
-    case KeyUpEvent(`key`) => up
+    case KeyDown(`key`) => down
+    case KeyUp(`key`) => up
   }
 
   def bindvec(v:vec2, amount:Real, allowDiagonals:Boolean=true)(up:Int, left:Int, down:Int, right:Int) =
     EventHandler {
-        case KeyHoldEvent(`left`) =>
+        case KeyHold(`left`) =>
           v.x = -amount
           if(!allowDiagonals) v.y = 0
-        case KeyHoldEvent(`right`) =>
+        case KeyHold(`right`) =>
           v.x = +amount
           if(!allowDiagonals) v.y = 0
-        case KeyHoldEvent(`down`) =>
+        case KeyHold(`down`) =>
           v.y = -amount
           if(!allowDiagonals) v.x = 0
-        case KeyHoldEvent(`up`) =>
+        case KeyHold(`up`) =>
           v.y = +amount
           if(!allowDiagonals) v.x = 0
-        case KeyUpEvent(`left`) |
-             KeyUpEvent(`right`) =>
+        case KeyUp(`left`) |
+             KeyUp(`right`) =>
           v.x = 0
           if(!allowDiagonals) v.y = 0
-        case KeyUpEvent(`down`) |
-             KeyUpEvent(`up`) =>
+        case KeyUp(`down`) |
+             KeyUp(`up`) =>
           v.y = 0
           if(!allowDiagonals) v.x = 0
     }
 //  def bindvec(v:vec2, amount:Real, allowDiagonals:Boolean=true)(up:Int, left:Int, down:Int, right:Int) =
 //    EventHandler {
-//        case KeyDownEvent(`left`) =>
+//        case KeyDown(`left`) =>
 //          v.x = -amount
 //          if(!allowDiagonals) v.y = 0
-//        case KeyDownEvent(`right`) =>
+//        case KeyDown(`right`) =>
 //          v.x = +amount
 //          if(!allowDiagonals) v.y = 0
-//        case KeyDownEvent(`down`) =>
+//        case KeyDown(`down`) =>
 //          v.y = -amount
 //          if(!allowDiagonals) v.x = 0
-//        case KeyDownEvent(`up`) =>
+//        case KeyDown(`up`) =>
 //          v.y = +amount
 //          if(!allowDiagonals) v.x = 0
-//        case KeyUpEvent(`left`) |
-//             KeyUpEvent(`right`) =>
+//        case KeyUp(`left`) |
+//             KeyUp(`right`) =>
 //          v.x = 0
 //          if(!allowDiagonals) v.y = 0
-//        case KeyUpEvent(`down`) |
-//             KeyUpEvent(`up`) =>
+//        case KeyUp(`down`) |
+//             KeyUp(`up`) =>
 //          v.y = 0
 //          if(!allowDiagonals) v.x = 0
 //    }

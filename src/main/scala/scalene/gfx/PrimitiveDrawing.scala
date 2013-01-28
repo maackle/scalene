@@ -25,7 +25,7 @@ trait PrimitiveDrawing extends gl {
     }
   }
   @inline
-  protected def getCircle(num:Int):VertexList = {
+  def getCircle(num:Int):VertexList = {
     if (!circlepts.isDefinedAt(num)) {
       circlepts += num -> {
         for (i:Int <- Array.range(0, num)) yield ( cos(2.0*Pi*i/num).toFloat , sin(2.0*Pi*i/num).toFloat )
@@ -45,9 +45,18 @@ trait PrimitiveDrawing extends gl {
     }
   }
 
-
   @inline def circle(radius:R, center:vec2=null, num:Int=0) {
-    @inline def guessCircleNum(radius:R) = 16
+    @inline def guessCircleNum(radius:R) = 64
+
+    glPushMatrix()
+    if(center!=null) translate(center)
+    scale(radius, radius)
+    unitCircle(if(num>0) num else guessCircleNum(radius))
+    glPopMatrix()
+  }
+
+  @inline def ring(radius:R, thickness:R, center:vec2=null, num:Int=0) {
+    @inline def guessCircleNum(radius:R) = 64
 
     glPushMatrix()
     if(center!=null) translate(center)

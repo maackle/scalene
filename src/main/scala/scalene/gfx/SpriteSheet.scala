@@ -39,7 +39,7 @@ trait SpriteSheetLike {
 
 }
 
-class SpriteSheet(val baseImage:Image, val columns:Int, val rows:Int) extends SpriteSheetLike {
+class SpriteSheet(protected val baseImage:Image, val columns:Int, val rows:Int) extends SpriteSheetLike {
 
   lazy val (width, height) = (baseImage.width, baseImage.height)
   lazy val images:Array[Image] = for {

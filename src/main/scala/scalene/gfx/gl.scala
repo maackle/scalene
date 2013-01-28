@@ -7,13 +7,13 @@ object gl extends gl
 
 trait gl {
 
-  def matrix(fn: => Unit) {
+  def matrix(fn: => Any) {
     glPushMatrix()
     fn
     glPopMatrix()
   }
 
-  def begin(what: Int)(fn: => Unit) {
+  def begin(what: Int)(fn: => Any) {
     def cancel() {
       glEnd()
     }
@@ -22,7 +22,7 @@ trait gl {
     glEnd()
   }
 
-  def enable(what: Int)(fn: => Unit) {
+  def enable(what: Int)(fn: => Any) {
     def cancel() {
       glEnd()
     }

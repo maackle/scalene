@@ -6,9 +6,10 @@ import scalene.gfx.{VectorBatch, Color}
 import demos.swifts.things.{Hawk, SwiftSwarm}
 import org.lwjgl.opengl.GL11
 import scalene.vector.{vec2, vec}
-import scalene.event.HandyHandlers
+import scalene.event._
 import scalene.components.CircleShape
-import scalene.core.traits.Render
+import scalene.core.traits.{Update, Render}
+import scalene.event.KeyDown
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,7 +22,7 @@ class PlayState extends State(TheSwifts) with HandyHandlers {
 
   val hawk = new Hawk
 
-  val swarm = new SwiftSwarm(1000, hawk)
+  val swarm = new SwiftSwarm(150, hawk)
 
   val chimney = new CircleShape with Render {
     def position: vec2 = vec2.zero
@@ -37,12 +38,18 @@ class PlayState extends State(TheSwifts) with HandyHandlers {
 
   val view = View2D (Color(0x444444))(
     Layer2D(1, swarm),
-    Layer2D(1.1f, chimney),
-//    Layer2D(1.2f, swarm.swifts),
-    Layer2D(1.2f, hawk)
+    Layer2D(1.0f, chimney),
+    Layer2D(1.0f, hawk)
   )
 
   val handler = {
-    zoomer(view, 0.99f)() ++ panner(view, 5)()
+    zoomer(view, 0.99f)(KEY_MINUS, KEY_EQUALS) ++ panner(view, 5)(KEY_W, KEY_A, KEY_S, KEY_D) ++ EventHandler {
+      case KeyDown(KEY_P) =>
+        pushState(new PauseState(this))
+      case MouseClick(_, pos) =>
+        println(view.toWorld(pos))
+//      case _ =>
+//        println(view.fromWorld(vec(0,0)))
+    }
   }
 }

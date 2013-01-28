@@ -12,7 +12,7 @@ import traits.{Hook, Update}
 abstract class Domain(val app:ScaleneApp) extends HashedThingStore with Update {
 
   def update(dt:Float) = ()
-  def currentState:State = app.currentState
+  def currentState:StateBase = app.currentState
 
   //TODO: a way to define an initialize() method that is called once onEnter for a State in this Domain
   //TODO: a way to easily associate States with their Domains, i.e. optional containers

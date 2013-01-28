@@ -6,7 +6,7 @@ import scalene.vector.{vec2, vec}
 import org.lwjgl.opengl.GL11
 import scalene.gfx.{AutoTransformer2D, Color}
 import scalene.event._
-import scalene.event.KeyHoldEvent
+import scalene.event.KeyHold
 
 class LogoTest extends /*State() with*/ EventSink {
 
@@ -16,8 +16,8 @@ class LogoTest extends /*State() with*/ EventSink {
   view.zoom = 5
 
   val handler = EventHandler {
-    case KeyHoldEvent(KEY_MINUS) => Op { view.zoom *= 0.99f }
-    case KeyHoldEvent(KEY_EQUALS) => Op { view.zoom *= 1.01f }
+    case KeyHold(KEY_MINUS) => Op { view.zoom *= 0.99f }
+    case KeyHold(KEY_EQUALS) => Op { view.zoom *= 1.01f }
   }
 
   object Logo {

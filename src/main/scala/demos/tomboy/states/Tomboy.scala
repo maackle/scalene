@@ -7,7 +7,7 @@ import scalene.vector.{vec, vec2}
 import scalene.event._
 import scalene.input.LWJGLKeyboard
 import scalene.core.{View2D, Domain, State}
-import scalene.event.KeyDownEvent
+import scalene.event.KeyDown
 import scalene.core.traits.{Update, ScaleneMixin, Render}
 import scalene.audio.SoundStore
 import demos.tomboy.Tomboy
@@ -100,10 +100,10 @@ object TomboyDomain extends Domain(Tomboy) {
     }
 
     val handler = EventHandler {
-      case KeyDownEvent(`keyUp`) => acceleration = gravity + vec(0,999)
-      case KeyUpEvent(`keyUp`) => acceleration = gravity
+      case KeyDown(`keyUp`) => acceleration = gravity + vec(0,999)
+      case KeyUp(`keyUp`) => acceleration = gravity
 
-//      case KeyDownEvent(keyFire) => Op { println("PEW") }
+//      case KeyDown(keyFire) => Op { println("PEW") }
     }
 
   }
