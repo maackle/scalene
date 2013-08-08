@@ -22,7 +22,7 @@ class PlayState extends State(TheSwifts) with HandyHandlers {
 
   val hawk = new Hawk
 
-  val swarm = new SwiftSwarm(150, hawk)
+  val swarm = new SwiftSwarm(1500, hawk)
 
   val chimney = new CircleShape with Render {
     def position: vec2 = vec2.zero

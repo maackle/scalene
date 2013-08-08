@@ -16,8 +16,6 @@ package object common {
 
   private var __onetimer = collection.mutable.Set[Op]()
 
-  private def _milliseconds = ((Sys.getTime * 1000) / Sys.getTimerResolution)
-
   private lazy val ms0 = System.currentTimeMillis()
 
   def milliseconds: Long = {

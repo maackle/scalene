@@ -9,6 +9,7 @@ object Transform {
     def inject = fn
   }
 }
+
 trait Transform { self =>
   @inline def inject()
   @inline def apply(bloc: =>Unit) = {
